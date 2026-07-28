@@ -1,8 +1,11 @@
 name: Build and Release Windows EXE
 
 on:
+  push:
+    tags:
+      - 'v*'
   release:
-    types: [created]
+    types: [published, created]
   workflow_dispatch:
 
 permissions:
@@ -45,3 +48,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
         with:
           files: Output/*.exe
+          tag_name: ${{ github.event.release.tag_name || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
