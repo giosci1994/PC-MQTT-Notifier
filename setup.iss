@@ -1,6 +1,6 @@
 [Setup]
 AppName=PC-MQTT-Notifier
-AppVersion=2.0
+AppVersion=1.0.0
 DefaultDirName={autopf}\PC-MQTT-Notifier
 DefaultGroupName=PC-MQTT-Notifier
 OutputBaseFilename=PC-MQTT-Notifier-Setup
@@ -14,6 +14,7 @@ UninstallDisplayIcon={app}\PC-MQTT-Notifier.exe
 [Files]
 Source: "dist\PC-MQTT-Notifier.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "icon.png"; DestDir: "{app}"; Flags: ignoreversion
+Source: "locales\*"; DestDir: "{app}\locales"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\PC-MQTT-Notifier"; Filename: "{app}\PC-MQTT-Notifier.exe"

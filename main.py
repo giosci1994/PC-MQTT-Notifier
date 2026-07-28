@@ -28,7 +28,14 @@ GITHUB_API_URL = f"https://api.github.com/repos/{REPO_NAME}/releases/latest"
 
 class Translator:
     def __init__(self, locale_dir="locales", default_lang="en"):
-        self.locale_dir = locale_dir
+        if getattr(sys, 'frozen', False):
+            base_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+            self.locale_dir = os.path.join(base_dir, locale_dir)
+            if not os.path.exists(self.locale_dir):
+                self.locale_dir = os.path.join(os.path.dirname(sys.executable), locale_dir)
+        else:
+            self.locale_dir = locale_dir
+
         self.default_lang = default_lang
         self.current_lang = default_lang
         self.strings = {}

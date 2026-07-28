@@ -24,7 +24,7 @@ jobs:
           
       - name: Build with PyInstaller
         run: |
-          pyinstaller --noconfirm --onefile --windowed --icon=icon.ico --add-data "icon.png;." --name "PC-MQTT-Notifier" main.py
+          pyinstaller --noconfirm --onefile --windowed --icon=icon.ico --add-data "icon.png;." --add-data "locales;locales" --name "PC-MQTT-Notifier" main.py
           
       - name: Compile Inno Setup Installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
