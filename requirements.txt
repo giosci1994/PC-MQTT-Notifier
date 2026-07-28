@@ -1,2 +1,7 @@
 paho-mqtt==2.1.0
 customtkinter==5.2.2
+pystray==0.19.5
+Pillow>=11.0.0
+pywinstyles==1.8
+hPyT==1.4.0
+requests>=2.31.0

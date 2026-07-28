@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#070b0a" />
+  <meta name="description"
+    content="PC-MQTT-Notifier — A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics." />
+  <title>PC-MQTT-Notifier — Desktop Notification Overlay</title>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="PC-MQTT-Notifier — Desktop Notification Overlay" />
+  <meta property="og:description"
+    content="Bypass Windows Toast. Own your notifications with a customizable, fluid overlay." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://giosci1994.github.io/PC-MQTT-Notifier/" />
+  <meta property="og:image" content="https://giosci1994.github.io/PC-MQTT-Notifier/social-preview.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css" />
+  <script src="./js/main.js" defer></script>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="bg-grid"></div>
+  </div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <a class="brand-main" href="#top" aria-label="PC-MQTT-Notifier Home">
+          <span>PC-MQTT-Notifier</span>
+        </a>
+      </div>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#features" data-en="Features" data-it="Funzionalità">Features</a>
+        <a href="#screenshots" data-en="Screenshots" data-it="Schermate">Screenshots</a>
+        <a href="#quickstart" data-en="Quick Start" data-it="Guida Rapida">Quick Start</a>
+      </nav>
+
+      <div class="nav-cta">
+        <button id="lang-toggle" class="btn ghost small">🇮🇹 IT</button>
+        <button id="theme-toggle" class="btn ghost small">☀️ Light</button>
+        <a class="btn primary small" href="https://github.com/giosci1994/PC-MQTT-Notifier" target="_blank"
+          rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <section class="hero">
+      <div class="hero-left">
+        <div class="kicker">
+          <span class="dot"></span>
+          <span data-en="Open Source Application" data-it="Applicazione Open Source">Open Source Application</span>
+        </div>
+
+        <h1 data-en='Desktop notifications, <span class="accent-text">reinvented</span>.' data-it='Notifiche desktop, <span class="accent-text">reinventate</span>.'>
+          Desktop notifications, <span class="accent-text">reinvented</span>.
+        </h1>
+
+        <p class="lead" data-en="A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics and displays floating notifications with a beautiful fluid background." data-it="Un'applicazione per Windows leggera e personalizzabile che riceve messaggi via MQTT e mostra bellissime notifiche fluttuanti con sfondo animato.">
+          A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics and displays floating notifications with a beautiful fluid background.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="#quickstart" data-en="Get started" data-it="Inizia Subito">Get started</a>
+          <a class="btn ghost" href="https://github.com/giosci1994/PC-MQTT-Notifier" target="_blank"
+            rel="noreferrer" data-en="View on GitHub" data-it="Vedi su GitHub">View on GitHub</a>
+        </div>
+
+        <div class="topics" role="list" aria-label="Topics">
+          <span class="pill" role="listitem">python</span>
+          <span class="pill" role="listitem">mqtt</span>
+          <span class="pill" role="listitem">customtkinter</span>
+          <span class="pill" role="listitem">windows</span>
+          <span class="pill" role="listitem">pystray</span>
+        </div>
+      </div>
+
+      <div class="hero-right" aria-hidden="true">
+        <div class="window">
+          <div class="win-bar">
+            <span class="win-title">pc-mqtt-notifier — popup</span>
+          </div>
+          <img src="./dark_pop-up_fluid.png" alt="PC-MQTT-Notifier Popup" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="section-head reveal">
+        <span class="section-label" data-en="// features" data-it="// funzionalità">// features</span>
+        <h2 data-en="Everything your desktop needs" data-it="Tutto ciò che serve al tuo desktop">Everything your desktop needs</h2>
+        <p data-en="Built with modern technologies to ensure customization, speed, and an amazing user experience." data-it="Costruito per garantire massima personalizzazione, fluidità e un'esperienza premium.">Built with modern technologies to ensure customization, speed, and an amazing user experience.</p>
+      </div>
+
+      <div class="cards-grid">
+        <article class="card reveal">
+          <span class="card-icon">🌊</span>
+          <h3 data-en="Fluid Background" data-it="Sfondo Fluido">Fluid Background</h3>
+          <p data-en="Gorgeous animated mesh gradients powered by optimized calculations. Uses 0% CPU when static mode is enabled." data-it="Sfondi animati a gradiente per un look premium. Consumo di CPU azzerato se disabilitato.">Gorgeous animated mesh gradients powered by optimized calculations. Uses 0% CPU when static mode is enabled.</p>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-icon">🎨</span>
+          <h3 data-en="Highly Customizable" data-it="Altamente Personalizzabile">Highly Customizable</h3>
+          <p data-en="Change scale, transparency, corner radius, and theme (Dark/Light). Make it look exactly how you want." data-it="Modifica grandezza, trasparenza, angoli e tema. Rendi l'app esattamente come la desideri.">Change scale, transparency, corner radius, and theme (Dark/Light). Make it look exactly how you want.</p>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-icon">🌍</span>
+          <h3 data-en="Bilingual (i18n)" data-it="Bilingue (i18n)">Bilingual (i18n)</h3>
+          <p data-en="Fully translated in English and Italian. Want another language? Just drop a JSON file in the locales folder!" data-it="Tradotto nativamente in Italiano e Inglese. Aggiungi nuove lingue inserendo un file JSON.">Fully translated in English and Italian. Want another language? Just drop a JSON file in the locales folder!</p>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-icon">⚙️</span>
+          <h3 data-en="System Tray & Auto-Updater" data-it="System Tray e Auto-Update">System Tray & Auto-Updater</h3>
+          <p data-en="Sits quietly in your system tray. Built-in auto-updater ensures you are always running the latest release." data-it="Gira silenziosamente in background. Un sistema di aggiornamento automatico ti avviserà delle nuove versioni.">Sits quietly in your system tray. Built-in auto-updater ensures you are always running the latest release.</p>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-icon">🔌</span>
+          <h3 data-en="MQTT Integration" data-it="Integrazione MQTT">MQTT Integration</h3>
+          <p data-en="Connect seamlessly with Home Assistant, Node-RED, or any custom MQTT broker on your local network." data-it="Connettiti nativamente a Home Assistant, Node-RED o qualsiasi broker MQTT locale.">Connect seamlessly with Home Assistant, Node-RED, or any custom MQTT broker on your local network.</p>
+        </article>
+
+        <article class="card reveal">
+          <span class="card-icon">📦</span>
+          <h3 data-en="Standalone Executable" data-it="Eseguibile Standalone">Standalone Executable</h3>
+          <p data-en="Packaged with PyInstaller and InnoSetup installer for simple one-click installation on Windows." data-it="Compilato con PyInstaller e installer InnoSetup per un'installazione immediata su Windows.">Packaged with PyInstaller and InnoSetup installer for simple one-click installation on Windows.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="screenshots" class="section">
+      <div class="section-head reveal">
+        <span class="section-label" data-en="// screenshots" data-it="// schermate">// screenshots</span>
+        <h2 data-en="Take a look around" data-it="Dai un'occhiata">Take a look around</h2>
+        <p data-en="A clean, unified UI designed to look beautiful on any wallpaper." data-it="Una UI pulita, progettata per essere stupenda su qualsiasi sfondo.">A clean, unified UI designed to look beautiful on any wallpaper.</p>
+      </div>
+
+      <div class="shots-grid">
+        <figure class="shot reveal">
+          <div class="window">
+            <div class="win-bar">
+              <span class="win-title">settings</span>
+            </div>
+            <img src="./settings.png" alt="Settings Window" loading="lazy" />
+          </div>
+          <figcaption data-en="Settings Dashboard" data-it="Pannello Impostazioni">Settings Dashboard</figcaption>
+        </figure>
+
+        <figure class="shot reveal">
+          <div class="window">
+            <div class="win-bar">
+              <span class="win-title">dark-theme</span>
+            </div>
+            <img src="./dark_pop-up_fluid.png" alt="Dark Theme" loading="lazy" />
+          </div>
+          <figcaption data-en="Dark Theme (Fluid Background)" data-it="Tema Scuro (Sfondo Fluido)">Dark Theme (Fluid Background)</figcaption>
+        </figure>
+
+        <figure class="shot reveal">
+          <div class="window">
+            <div class="win-bar">
+              <span class="win-title">light-theme</span>
+            </div>
+            <img src="./light_pop-up_static.png" alt="Light Theme" loading="lazy" />
+          </div>
+          <figcaption data-en="Light Theme (Static Background)" data-it="Tema Chiaro (Sfondo Statico)">Light Theme (Static Background)</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="quickstart" class="section">
+      <div class="section-head reveal">
+        <span class="section-label" data-en="// quickstart" data-it="// guida rapida">// quickstart</span>
+        <h2 data-en="Quick Installation & Setup" data-it="Installazione e Avvio Rapido">Quick Installation & Setup</h2>
+        <p data-en="Run the pre-compiled installer or launch directly from Python source code." data-it="Esegui l'installer compilato o avvia direttamente dal codice sorgente Python.">Run the pre-compiled installer or launch directly from Python source code.</p>
+      </div>
+
+      <div class="quickstart reveal" style="background: var(--bg-soft); border: 1px solid var(--border); padding: 32px; border-radius: var(--radius-lg);">
+        <p style="color: var(--text); font-weight: 600; margin-bottom: 16px;" data-en="Option 1: Pre-compiled Installer (.exe)" data-it="Opzione 1: Installer Compilato (.exe)">Option 1: Pre-compiled Installer (.exe)</p>
+        <p data-en="Download the latest release executable from GitHub and follow the setup wizard." data-it="Scarica l'eseguibile dell'ultima versione da GitHub e segui la procedura guidata.">Download the latest release executable from GitHub and follow the setup wizard.</p>
+        <div style="margin: 20px 0;">
+          <a class="btn primary" href="https://github.com/giosci1994/PC-MQTT-Notifier/releases/latest" data-en="Download Latest Installer (.exe)" data-it="Scarica Ultimo Installer (.exe)">Download Latest Installer (.exe)</a>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 32px 0;" />
+
+        <p style="color: var(--text); font-weight: 600; margin-bottom: 16px;" data-en="Option 2: Run from Source Code" data-it="Opzione 2: Esegui da Codice Sorgente">Option 2: Run from Source Code</p>
+        <div class="code-block" style="background: #040807; padding: 20px; border-radius: 12px; font-family: var(--font-mono); font-size: 0.9rem; color: #34d399; overflow-x: auto; border: 1px solid var(--border);">
+<pre><code># Clone repository
+git clone https://github.com/giosci1994/PC-MQTT-Notifier.git
+cd PC-MQTT-Notifier
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch application
+python main.py</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="border-top: 1px solid var(--border); padding: 40px 0; margin-top: 80px; text-align: center; color: var(--muted); font-size: 0.9rem;">
+    <div class="container">
+      <p>© <span id="year">2026</span> Arborae / giosci1994. Released under the GPLv3 License.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+
+</html>
