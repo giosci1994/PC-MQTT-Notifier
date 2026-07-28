@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+venv/
+env/
+.venv/
+
+# Config (MANTENERE SEGRETO)
+config.json
+
+# IDE
+.vscode/
+.idea/
