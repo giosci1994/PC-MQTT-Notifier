@@ -12,6 +12,7 @@ Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) 
   <img src="https://img.shields.io/github/downloads/giosci1994/PC-MQTT-Notifier/total?color=34d399" alt="Downloads" />
   <img src="https://img.shields.io/badge/platform-Windows-0078d4" alt="Windows" />
   <a href="LICENSE"><img src="https://img.shields.io/github/license/giosci1994/PC-MQTT-Notifier" alt="License" /></a>
+  <a href="https://buymeacoffee.com/giosci1994u"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" /></a>
 </p>
 
 <p align="center">
@@ -150,6 +151,12 @@ PC-MQTT-Notifier/
 
 ---
 
+## ☕ Support
+
+If PC-MQTT-Notifier is useful to you, you can buy me a coffee.
+
+<a href="https://buymeacoffee.com/giosci1994u"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="45" alt="Buy Me a Coffee" /></a>
+
 ## 📄 License
 
 Distributed under the **GPLv3 License**. See [`LICENSE`](LICENSE) for more information.
@@ -228,6 +235,12 @@ pyinstaller --noconsole --onefile --icon=icon.ico --name="PC-MQTT-Notifier" main
 Per compilare l'installer Windows `.exe`, usa **Inno Setup 6** sul file `setup.iss`.
 
 ---
+
+## ☕ Supporta il progetto
+
+Se PC-MQTT-Notifier ti è utile, puoi offrirmi un caffè.
+
+<a href="https://buymeacoffee.com/giosci1994u"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="45" alt="Buy Me a Coffee" /></a>
 
 ## 📄 Licenza
 
