@@ -1,0 +1,165 @@
+<!doctype html>
+<!-- Source of docs/social-preview.png (1280x640), the GitHub social preview.
+     Regenerate (Firefox, any OS), from the folder of this file:
+       firefox --headless --window-size=1280,640 --screenshot social-preview.png social-preview.html
+     Same design system as the other projects (Arborae palette, Space Grotesk / Inter / JetBrains Mono). -->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { width: 1280px; height: 640px; overflow: hidden; }
+
+    body {
+      font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      color: #eef4f2;
+      background:
+        radial-gradient(900px 560px at 85% -15%, rgba(0, 181, 133, 0.22), transparent 60%),
+        radial-gradient(800px 520px at 0% 120%, rgba(95, 179, 166, 0.14), transparent 60%),
+        #070b0a;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(1000px 620px at 50% 30%, #000 50%, transparent 100%);
+    }
+
+    .wrap {
+      position: relative;
+      height: 100%;
+      padding: 64px 72px;
+      display: grid;
+      grid-template-columns: 1fr 470px;
+      gap: 48px;
+    }
+
+    .left { display: flex; flex-direction: column; }
+
+    .kicker {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 18px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: #34d399;
+    }
+    .kicker .dot { width: 11px; height: 11px; border-radius: 50%; background: #34d399; box-shadow: 0 0 16px #34d399; }
+
+    h1 {
+      margin-top: 26px;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      font-size: 78px; font-weight: 700;
+      line-height: 1; letter-spacing: -2px;
+    }
+
+    .sub {
+      margin-top: 18px;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      font-size: 36px; font-weight: 600;
+      color: #9db3ad; line-height: 1.2;
+    }
+    .sub b {
+      background: linear-gradient(120deg, #34d399, #5fb3a6);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .desc {
+      margin-top: 22px;
+      max-width: 600px;
+      font-size: 22px; line-height: 1.5;
+      color: #b6c8c2;
+    }
+
+    .bottom { margin-top: auto; }
+
+    .badges { display: flex; gap: 12px; flex-wrap: wrap; }
+    .badge {
+      padding: 10px 18px;
+      font-size: 19px; font-weight: 600;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #dbe7e3;
+    }
+    .badge.win { border-color: rgba(76, 194, 255, 0.5); color: #8fd6ff; }
+    .badge.green { border-color: rgba(0, 181, 133, 0.5); color: #34d399; }
+
+    .repo {
+      margin-top: 22px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 20px; color: #64756f;
+    }
+    .repo b { color: #eef4f2; font-weight: 600; }
+
+    .right { display: flex; align-items: center; }
+
+    .window {
+      width: 100%;
+      background: rgba(10, 16, 15, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px -24px rgba(0, 0, 0, 0.7), 0 0 90px -30px rgba(0, 181, 133, 0.35);
+      transform: perspective(1400px) rotateY(-6deg) rotateX(2deg);
+    }
+
+    .bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 15px; color: #64756f;
+    }
+
+
+    .shot { display:block; width:100%; padding:22px; background:#0b0f0e; } .shot img { display:block; width:100%; border-radius:14px; }
+    .payload { padding: 0 22px 22px; font-family:'JetBrains Mono',monospace; font-size:15px; color:#9db3ad; line-height:1.5; } .payload b { color:#34d399; font-weight:600; }
+    h1 { font-size: 64px; white-space: nowrap; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="left">
+      <span class="kicker"><span class="dot"></span> Windows · MQTT · Home Assistant</span>
+      <h1>PC-MQTT-Notifier</h1>
+      <div class="sub">Your notifications, <b>your way</b>.</div>
+      <div class="desc">
+        A lightweight Windows overlay for MQTT messages from Home Assistant, Node-RED or any script.
+      </div>
+
+      <div class="bottom">
+        <div class="badges">
+          <span class="badge win">🪟 Windows</span>
+          <span class="badge ">Python</span>
+          <span class="badge green">MQTT</span>
+          <span class="badge ">GPLv3</span>
+        </div>
+        <div class="repo"><b>github.com/giosci1994</b>/PC-MQTT-Notifier</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="window">
+        <div class="bar"><span>homeassistant/…/notify</span><span>● MQTT</span></div>
+        <div class="shot"><img src="dark_pop-up_fluid.png" alt="" /></div>
+        <div class="payload">{ <b>"title"</b>: "Front door opened",<br>&nbsp;&nbsp;<b>"message"</b>: "Triggered at 16:20." }</div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -37,11 +37,23 @@ jobs:
         with:
           path: setup.iss
 
+      - name: SHA256SUMS.txt and VERIFY.ps1
+        shell: pwsh
+        run: |
+          Get-ChildItem Output -Filter *.exe | Sort-Object Name |
+            ForEach-Object { "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $_.Name } |
+            Set-Content -Path Output/SHA256SUMS.txt -Encoding ascii
+          Copy-Item scripts/VERIFY.ps1 Output/VERIFY.ps1
+          Get-Content Output/SHA256SUMS.txt
+
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: PC-MQTT-Notifier-Setup
-          path: Output/*.exe
+          path: |
+            Output/*.exe
+            Output/SHA256SUMS.txt
+            Output/VERIFY.ps1
 
       - name: Upload Installer to Release
         uses: softprops/action-gh-release@v2
@@ -49,5 +61,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: Output/*.exe
+          files: |
+            Output/*.exe
+            Output/SHA256SUMS.txt
+            Output/VERIFY.ps1
           tag_name: ${{ github.event.release.tag_name || github.ref_name }}

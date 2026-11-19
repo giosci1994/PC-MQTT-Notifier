@@ -1,23 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Theme Toggle
-  const themeToggle = document.getElementById('theme-toggle');
-  const root = document.documentElement;
-
-  if (themeToggle) {
-    let isLight = false;
-    themeToggle.addEventListener('click', () => {
-      isLight = !isLight;
-      if (isLight) {
-        root.classList.add('light');
-        themeToggle.textContent = '🌙 Dark';
-      } else {
-        root.classList.remove('light');
-        themeToggle.textContent = '☀️ Light';
-      }
-    });
-  }
-
-  // 2. Language Toggle
+  // 1. Language Toggle
   const langToggle = document.getElementById('lang-toggle');
   if (langToggle) {
     let isItalian = false;
@@ -37,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 3. Scroll Reveal Animation (Arborae Standard)
+  // 2. Scroll Reveal Animation (Arborae Standard)
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reveals = document.querySelectorAll('.reveal');
 

@@ -2,7 +2,7 @@
 
 **Bypass Windows Toast. Own your notifications with a lightweight, highly customizable, fluid overlay connected to MQTT.**
 
-**🇬🇧 English** · [🇮🇹 Italiano](#italiano)
+### 🌐 [giosci1994.github.io/PC-MQTT-Notifier](https://giosci1994.github.io/PC-MQTT-Notifier/)
 
 Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) and display sleek, non-invasive desktop notifications with animated fluid backgrounds on Windows.
 
@@ -55,6 +55,16 @@ Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) 
 ### Option 2: Portable Executable
 1. Download `PC-MQTT-Notifier.exe` from the Releases page.
 2. Run it anywhere on your system without installation.
+
+### Verify the download
+From the next release, every release also has `SHA256SUMS.txt` and `VERIFY.ps1`. Put them in the
+same folder as the downloaded `.exe` and run, in PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\VERIFY.ps1
+# or by hand, then compare with SHA256SUMS.txt:
+Get-FileHash .\PC-MQTT-Notifier-Setup-1.0.0.exe -Algorithm SHA256
+```
 
 ---
 
@@ -129,6 +139,7 @@ PC-MQTT-Notifier/
 ├── config.json              # Saved configuration settings
 ├── icon.png / icon.ico      # Application icons
 ├── setup.iss                # InnoSetup installer configuration
+├── scripts/VERIFY.ps1       # Checks downloads against SHA256SUMS.txt (shipped with each release)
 ├── locales/                 # i18n translation files
 │   ├── en.json              # English locale
 │   └── it.json              # Italian locale
@@ -136,6 +147,7 @@ PC-MQTT-Notifier/
 │   ├── index.html           # Arborae-standard landing page
 │   ├── css/style.css        # Stylesheet & design system
 │   ├── js/main.js           # Scroll reveal & toggle scripts
+│   ├── social-preview.html  # Source of the social preview (Firefox headless screenshot)
 │   └── social-preview.png   # 1280x640 social preview image
 └── .github/
     └── workflows/
@@ -162,88 +174,3 @@ If PC-MQTT-Notifier is useful to you, you can buy me a coffee.
 Distributed under the **GPLv3 License**. See [`LICENSE`](LICENSE) for more information.
 
 Developed with ❤️ by **[giosci1994](https://github.com/giosci1994)** / **Arborae**.
-
-<br>
-
----
----
-
-<a id="italiano"></a>
-
-# 🇮🇹 Italiano
-
-**Supera le notifiche native di Windows. Gestisci le tue notifiche con un'overlay fluttuante, leggero e personalizzabile collegato via MQTT.**
-
-Ascolta qualsiasi **topic MQTT** (da Home Assistant, Node-RED o script custom) e mostra notifiche desktop eleganti con sfondi animati a gradiente su Windows.
-
----
-
-## ✨ Funzionalità
-
-- 🌊 **Sfondo Fluido Animato**: Sfondi animati a gradiente basati sulle curve di Lissajous. Consumo CPU azzerato in modalità statica.
-- 🎨 **Altamente Personalizzabile**: Regola la scala dell'interfaccia, la trasparenza, il raggio degli angoli, gli FPS dell'animazione e la posizione sullo schermo (in alto al centro, in basso a destra, ecc.).
-- 🌍 **Multilingua Nativo (i18n)**: Traduzione completa in Italiano e Inglese. Aggiungi nuove lingue inserendo un semplice file JSON nella cartella `locales/`.
-- ⚙️ **Integrazione System Tray**: Gira silenziosamente nella tray di Windows con menu di impostazioni ed anteprima istantanea.
-- 🔄 **Auto-Updater da GitHub**: Sistema integrato di controllo aggiornamenti che ti avvisa ed installa l'ultima versione `.exe` in un click.
-- 🔌 **Pronto per Home Assistant & MQTT**: Riceve payload JSON standard da Home Assistant, Node-RED o qualsiasi broker MQTT locale.
-
----
-
-## ⚙️ Formato Payload MQTT
-
-L'applicazione si iscrive al topic specificato (default: `homeassistant/pc_giovanni/notify`).
-
-### 📩 Esempio Payload JSON
-```json
-{
-  "title": "Porta Principale Aperta",
-  "message": "Il sensore dell'ingresso è stato attivato alle 16:20."
-}
-```
-
-### 🏠 Esempio Automazione Home Assistant
-```yaml
-action: mqtt.publish
-data:
-  topic: homeassistant/pc_giovanni/notify
-  payload: >-
-    {
-      "title": "Picco Fotovoltaico",
-      "message": "La produzione dei pannelli ha superato 4.5 kW!"
-    }
-```
-
----
-
-## 🛠️ Sviluppo & Compilazione
-
-```bash
-# Clonazione repository
-git clone https://github.com/giosci1994/PC-MQTT-Notifier.git
-cd PC-MQTT-Notifier
-
-# Installazione dipendenze
-pip install -r requirements.txt
-
-# Avvio applicazione
-python main.py
-
-# Compilazione Eseguibile
-pyinstaller --noconsole --onefile --icon=icon.ico --name="PC-MQTT-Notifier" main.py
-```
-
-Per compilare l'installer Windows `.exe`, usa **Inno Setup 6** sul file `setup.iss`.
-
----
-
-## ☕ Supporta il progetto
-
-Se PC-MQTT-Notifier ti è utile, puoi offrirmi un caffè.
-
-<a href="https://buymeacoffee.com/giosci1994u"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="45" alt="Buy Me a Coffee" /></a>
-
-## 📄 Licenza
-
-Distribuito sotto licenza **GPLv3**. Vedi [`LICENSE`](LICENSE) per ulteriori informazioni.
-
-Sviluppato con ❤️ da **[giosci1994](https://github.com/giosci1994)** / **Arborae**.
