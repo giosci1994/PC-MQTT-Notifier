@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import sys
+import tempfile
 import time
 
 import notification_styles as nstyles
@@ -64,12 +65,16 @@ def config_path():
 
 
 def program_dirs():
-    """Where the program's own files can be: inside the exe, next to it, next to this file."""
+    """Where the program's own files can be: inside the exe (_MEIPASS / _internal), next to it, next to this file."""
     dirs = []
     if getattr(sys, "frozen", False):
         if getattr(sys, "_MEIPASS", None):
-            dirs.append(sys._MEIPASS)
-        dirs.append(os.path.dirname(os.path.abspath(sys.executable)))
+            dirs.append(os.path.abspath(sys._MEIPASS))
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        internal_dir = os.path.join(exe_dir, "_internal")
+        if os.path.isdir(internal_dir):
+            dirs.append(internal_dir)
+        dirs.append(exe_dir)
     dirs.append(os.path.dirname(os.path.abspath(__file__)))
     out = []
     for d in dirs:
@@ -373,6 +378,91 @@ def sha256_file(path):
         for chunk in iter(lambda: f.read(1 << 16), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+_PYINSTALLER_ENV_VARS = frozenset({
+    "_MEIPASS2",
+    "_MEIPASS",
+    "TCL_LIBRARY",
+    "TK_LIBRARY",
+    "PYTHONHOME",
+    "PYTHONPATH",
+})
+
+
+def _is_subpath(path, root):
+    if not path or not root:
+        return False
+    np = os.path.normcase(os.path.normpath(path))
+    nr = os.path.normcase(os.path.normpath(root))
+    if np == nr:
+        return True
+    prefix = nr if nr.endswith(os.sep) else nr + os.sep
+    return np.startswith(prefix)
+
+
+def _is_mei_temp_path(entry, temp_roots):
+    if not entry:
+        return False
+    ne = os.path.normcase(os.path.normpath(entry))
+    for root in temp_roots:
+        if not root:
+            continue
+        nr = os.path.normcase(os.path.normpath(root))
+        prefix = nr if nr.endswith(os.sep) else nr + os.sep
+        if ne.startswith(prefix):
+            rel = ne[len(prefix):]
+            first_part = rel.split(os.sep, 1)[0]
+            if first_part.upper().startswith("_MEI"):
+                return True
+    return False
+
+
+def _should_drop_path_entry(entry, meipass, temp_roots):
+    candidate = entry.strip().strip('"')
+    if not candidate:
+        return False
+    if _is_subpath(candidate, meipass):
+        return True
+    return _is_mei_temp_path(candidate, temp_roots)
+
+
+def clean_subprocess_env(env=None, meipass=None, temp_dir=None):
+    """Return a clean copy of ``env`` without PyInstaller/Tcl/Tk overrides.
+
+    Used before spawning the installer so the newly launched app never inherits
+    ``_MEIPASS2``, ``TCL_LIBRARY``, ``TK_LIBRARY``, ``PYTHONHOME``,
+    ``PYTHONPATH``, or stale ``_MEI*`` / ``sys._MEIPASS`` entries in ``PATH``.
+    """
+    source = os.environ if env is None else env
+    if meipass is None:
+        meipass = getattr(sys, "_MEIPASS", None)
+
+    temp_roots = []
+    if temp_dir:
+        temp_roots.append(temp_dir)
+    for key in ("TMPDIR", "TEMP", "TMP"):
+        val = source.get(key)
+        if val:
+            temp_roots.append(val)
+    try:
+        temp_roots.append(tempfile.gettempdir())
+    except Exception:
+        pass
+
+    cleaned = {}
+    for key, val in source.items():
+        if key.upper() in _PYINSTALLER_ENV_VARS:
+            continue
+        if key.upper() == "PATH":
+            parts = [
+                p for p in str(val).split(os.pathsep)
+                if not _should_drop_path_entry(p, meipass, temp_roots)
+            ]
+            cleaned[key] = os.pathsep.join(parts)
+        else:
+            cleaned[key] = val
+    return cleaned
 
 
 # --- Settings form ---------------------------------------------------------

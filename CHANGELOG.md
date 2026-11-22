@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.1
+
+### Fixed
+- In-app auto-update no longer fails with `Failed to load Python DLL (...\_MEI...\python311.dll)`: the installer is now launched with a clean environment (removing inherited PyInstaller variables and `_MEI*` paths) and detached from the closing app.
+- Windows 11 Glass style no longer shows a rectangular grey halo outside rounded corners: removed the secondary acrylic backdrop window (whose `SetWindowRgn` clipping is ignored by DWM on Windows 11) in favour of pure per-pixel alpha via `UpdateLayeredWindow`.
+
+### Build
+- Switched PyInstaller packaging from `--onefile` to `--onedir` inside the Inno Setup installer: faster startup, no runtime extraction into `Temp\_MEI*`, and fewer Windows Defender false positives.
+
 ## 1.1.0
 
 ### New

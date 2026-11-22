@@ -25,7 +25,7 @@ import app_core
 log = app_core.log
 ICON_FILE = app_core.resource_path("icon.png")
 ICON_ICO = app_core.resource_path("icon.ico")
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.1"
 REPO_NAME = "giosci1994/PC-MQTT-Notifier"
 GITHUB_API_URL = f"https://api.github.com/repos/{REPO_NAME}/releases/latest"
 
@@ -363,7 +363,9 @@ class StyledPopup:
     """One notification in style A (aurora) or B (glass), drawn with Pillow.
 
     On Windows the window has per-pixel alpha (UpdateLayeredWindow): smooth
-    corners, shadow and glow. For B an acrylic window sits under the card.
+    corners, shadow and glow. Style B ("glass") uses only this layered window
+    (no separate acrylic backdrop window, because on Windows 11 DWM ignores
+    SetWindowRgn with ACCENT_ENABLE_ACRYLICBLURBEHIND).
     If something fails (or not on Windows) it falls back to the old way:
     -transparentcolor and -alpha, card only, edges blended on its colour.
     """
@@ -409,15 +411,15 @@ class StyledPopup:
             try:
                 self.renderer = self.make_renderer(margin=True)
                 self.place()
-                if self.renderer.style == "glass":
-                    self.backdrop_pending = self.open_backdrop()
+                # No acrylic backdrop window for "glass": DWM ignores SetWindowRgn
+                # with ACCENT_ENABLE_ACRYLICBLURBEHIND on Windows 11, showing a
+                # gray rectangle behind rounded cards.
                 self.open_layered()
                 opened = True
             except Exception as e:
                 log.warning("Finestra a strati non disponibile, uso il fallback: %s", e)
                 self.close_windows()
         if not opened:
-            self.backdrop_pending = False
             self.renderer = self.make_renderer(margin=False)
             self.place()
             self.open_fallback()
@@ -450,22 +452,6 @@ class StyledPopup:
             win.bind("<Button-1>", lambda _e: self.on_click())
         return win
 
-    def open_backdrop(self):
-        # Acrylic (blurred desktop) under the glass card; shown after the entrance
-        r = self.renderer
-        try:
-            bd = self.new_window("black")
-            bd.geometry(f"{r.cw}x{r.ch}+{self.OFFSCREEN}+{self.OFFSCREEN}")
-            bd.update_idletasks()
-            hwnd = nstyles.root_hwnd(bd.winfo_id())
-            if nstyles.make_acrylic_backdrop(hwnd, (r.cw, r.ch), r.radius, self.dark):
-                self.backdrop = bd
-                return True
-            bd.destroy()
-        except Exception as e:
-            log.warning("Acrilico non disponibile: %s", e)
-        return False
-
     def open_layered(self):
         r = self.renderer
         w, h = r.size
@@ -497,27 +483,6 @@ class StyledPopup:
         m = self.renderer.m
         return self.card_x - m, int(round(self.card_y - m + dy))
 
-    def show_backdrop(self):
-        self.backdrop_pending = False
-        if self.backdrop is None:
-            return
-        try:
-            r = self.renderer
-            self.backdrop.geometry(f"{r.cw}x{r.ch}+{self.card_x}+{self.card_y}")
-            self.win.lift()
-            self.renderer.set_backdrop(True)
-        except Exception:
-            self.hide_backdrop()
-
-    def hide_backdrop(self):
-        if self.backdrop is not None:
-            try:
-                self.backdrop.destroy()
-            except Exception:
-                pass
-            self.backdrop = None
-        self.renderer.set_backdrop(False)
-
     def tick(self):
         self.task = None
         if self.closed:
@@ -535,8 +500,6 @@ class StyledPopup:
             e = elapsed / self.ENTER
             alpha = self.alpha * min(1.0, elapsed / self.FADE_IN)
             dy = -18 * s * (1 - nstyles.ease_out_back(e))
-            if e >= 1 and self.backdrop_pending:
-                self.show_backdrop()
         try:
             img = self.renderer.frame(elapsed, 1.0 - elapsed / self.duration)
             x, y = self.window_pos(dy)
@@ -557,21 +520,17 @@ class StyledPopup:
             return
         self.exiting = True
         self.exit_t0 = time.monotonic()
-        self.backdrop_pending = False
-        self.hide_backdrop()
 
     def close_windows(self):
         if self.layered is not None:
             self.layered.close()
             self.layered = None
-        for win in (self.win, self.backdrop):
-            if win is not None:
-                try:
-                    win.destroy()
-                except Exception:
-                    pass
+        if self.win is not None:
+            try:
+                self.win.destroy()
+            except Exception:
+                pass
         self.win = None
-        self.backdrop = None
         self.canvas = None
 
     def destroy(self):
@@ -1115,7 +1074,13 @@ class MainApplication(ctk.CTk):
                 log.info("Aggiornamento %s verificato, avvio dell'installer", ver)
                 self.app_message(_("update_title", "Update Available"), _("update_installing", "Installing update, the app will restart shortly."))
                 time.sleep(2)
-                subprocess.Popen([exe_path, "/SILENT", "/CLOSEAPPLICATIONS"])
+                popen_kwargs = {"env": app_core.clean_subprocess_env()}
+                if os.name == "nt":
+                    popen_kwargs["creationflags"] = (
+                        getattr(subprocess, "DETACHED_PROCESS", 0)
+                        | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+                    )
+                subprocess.Popen([exe_path, "/SILENT", "/CLOSEAPPLICATIONS"], **popen_kwargs)
                 self.command_queue.put("quit")
             except Exception as e:
                 log.error("Aggiornamento non riuscito: %s", e)

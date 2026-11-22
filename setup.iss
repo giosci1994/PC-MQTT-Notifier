@@ -1,6 +1,6 @@
 ; The CI passes the version from the git tag: iscc /DMyAppVersion=1.2.3 setup.iss
 #ifndef MyAppVersion
-  #define MyAppVersion "1.1.0"
+  #define MyAppVersion "1.1.1"
 #endif
 
 [Setup]
@@ -19,10 +19,7 @@ UninstallDisplayIcon={app}\PC-MQTT-Notifier.exe
 CloseApplications=force
 
 [Files]
-Source: "dist\PC-MQTT-Notifier.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "icon.png"; DestDir: "{app}"; Flags: ignoreversion
-Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "locales\*"; DestDir: "{app}\locales"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\PC-MQTT-Notifier\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\PC-MQTT-Notifier"; Filename: "{app}\PC-MQTT-Notifier.exe"; WorkingDir: "{app}"

@@ -1,6 +1,6 @@
 """New notification styles (A "aurora", B "glass") drawn with Pillow,
 plus the few Windows helpers they need (per-pixel alpha layered window,
-acrylic backdrop, app theme from the registry).
+app theme from the registry; acrylic backdrop helper kept unused).
 
 This module never imports tkinter: the drawing part runs anywhere Pillow
 runs (it is also used to render preview PNGs off Windows). Everything that
@@ -440,12 +440,15 @@ class CardRenderer:
             self.fill = solid(csize, self.bg, self.card_mask, fill_a)
             inner = rr_mask(csize, (1.5 * s, 1.5 * s, cw - 1.5 * s, ch - 1.5 * s), max(0, self.radius - 1.5 * s))
             self.border_mask = ImageChops.subtract(self.card_mask, inner)
-            gm = Image.new("L", self.size, 0)
-            e = 4 * s
-            ImageDraw.Draw(gm).rounded_rectangle(
-                (m - e, m - e, m + cw + e, m + ch + e), radius=self.radius + e, fill=255)
-            gm = gm.filter(ImageFilter.GaussianBlur(12 * s))
-            self.glow_mask = gm.point(lambda v: int(v * self.glow))
+            if m:
+                gm = Image.new("L", self.size, 0)
+                e = 4 * s
+                ImageDraw.Draw(gm).rounded_rectangle(
+                    (m - e, m - e, m + cw + e, m + ch + e), radius=self.radius + e, fill=255)
+                gm = gm.filter(ImageFilter.GaussianBlur(12 * s))
+                self.glow_mask = gm.point(lambda v: int(v * self.glow))
+            else:
+                self.glow_mask = None
             self.angle = _angle_map(self.size, (m + cw // 2, m + ch // 2))
             self.lut = _gradient_lut(RAINBOW)
             bar = Image.new("RGB", (len(self.lut), 1))
@@ -593,9 +596,10 @@ class CardRenderer:
         m = self.m
         if self.style == "glass":
             colors = self._conic(t)
-            glow = colors.convert("RGBA")
-            glow.putalpha(self.glow_mask)
-            out.alpha_composite(glow)
+            if self.glow_mask is not None:
+                glow = colors.convert("RGBA")
+                glow.putalpha(self.glow_mask)
+                out.alpha_composite(glow)
             card = self.fill.copy()
             border = colors.crop(self.card_box).convert("RGBA")
             border.putalpha(self.border_mask)
@@ -776,7 +780,12 @@ class LayeredWindow:
 
 def make_acrylic_backdrop(hwnd, size, radius, dark):
     """Acrylic blur behind a borderless window, clipped to a rounded rectangle.
-    Returns True if Windows accepted it (Windows 10 1803+ / 11)."""
+    Returns True if Windows accepted it (Windows 10 1803+ / 11).
+
+    Unused by StyledPopup: on Windows 11 DWM ignores SetWindowRgn when
+    ACCENT_ENABLE_ACRYLICBLURBEHIND is enabled, leaving a rectangular gray
+    backdrop behind rounded cards.
+    """
     w = _win32()
     ct = w.ctypes
     width, height = size
