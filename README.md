@@ -23,11 +23,13 @@ Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) 
 
 ## ✨ Features
 
-- 🌊 **Fluid Background**: Gorgeous animated mesh gradients powered by fast Lissajous curve calculations. Uses 0% CPU in static background mode.
+- 🪟 **Four notification styles**: *Windows 11 Glass* (blurred acrylic background with a thin animated rainbow border and a full or soft glow), *Soft Aurora* (three slowly moving colour blobs, palettes Night, Sunset, Forest), *Classic* (the animated rainbow mesh gradient) and *Static* (no animation, 0% CPU).
+- 🌗 **Dark, Light or Same as Windows**: the notification follows the Windows app theme by itself.
+- 🔔 **Icons and app name**: optional `icon` and `app` fields in the payload; a progress bar shows the remaining time; click a notification to close it.
 - 🎨 **Highly Customizable**: Change UI scale, opacity/transparency, corner radius, animation FPS, display duration, and screen position (top-center, bottom-right, top-right, bottom-center).
 - 🌍 **Native i18n (Bilingual)**: Full built-in English and Italian translations. Easily add new languages by dropping a JSON file into the `locales/` folder.
 - ⚙️ **System Tray Native**: Runs quietly in your system tray with single-click settings and instant test previews.
-- 🔄 **GitHub Auto-Updater**: Built-in update checker that automatically notifies you and installs the latest `.exe` release in one click.
+- 🔄 **GitHub Auto-Updater**: Built-in update checker that notifies you and installs the latest release in one click, only after checking its SHA256 against `SHA256SUMS.txt`.
 - 🔌 **Home Assistant & MQTT Ready**: Receives simple JSON payloads from Home Assistant, Node-RED, or any custom MQTT broker.
 
 ---
@@ -48,13 +50,13 @@ Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) 
 
 ## 🚀 Installation
 
-### Option 1: Installer (Recommended)
-1. Download `PC-MQTT-Notifier-Setup-1.0.0.exe` from the **[Releases](../../releases)** page.
+### Installer
+1. Download `PC-MQTT-Notifier-Setup.exe` from the **[Releases](../../releases)** page.
 2. Run the installer. It will automatically place the application in your Start Menu and support **1-click auto-updates**.
 
-### Option 2: Portable Executable
-1. Download `PC-MQTT-Notifier.exe` from the Releases page.
-2. Run it anywhere on your system without installation.
+The releases contain only the installer (no portable `.exe`). Settings are saved in
+`%APPDATA%\PC-MQTT-Notifier\config.json`, the log in `%APPDATA%\PC-MQTT-Notifier\notifier.log`;
+the MQTT password is kept in the Windows Credential Manager, not in the file.
 
 ### Verify the download
 From the next release, every release also has `SHA256SUMS.txt` and `VERIFY.ps1`. Put them in the
@@ -63,14 +65,17 @@ same folder as the downloaded `.exe` and run, in PowerShell:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\VERIFY.ps1
 # or by hand, then compare with SHA256SUMS.txt:
-Get-FileHash .\PC-MQTT-Notifier-Setup-1.0.0.exe -Algorithm SHA256
+Get-FileHash .\PC-MQTT-Notifier-Setup.exe -Algorithm SHA256
 ```
 
 ---
 
 ## ⚙️ MQTT Payload & Setup
 
-The application subscribes to your specified MQTT topic (default: `homeassistant/pc_giovanni/notify`).
+The application subscribes (QoS 1) to the MQTT topic set in the settings (default: `pc-notifier/notify`).
+Set the broker address the first time you open the settings. Turn on **TLS** to connect on port 8883
+with the certificates trusted by Windows. Retained messages are ignored, and messages sent while the PC was off are not delivered later (clean session), so old notifications are not shown at startup.
+Notifications that arrive together are shown one after the other (up to 10 waiting), on the primary monitor, above the taskbar.
 
 ### 📩 JSON Payload Format
 Send a JSON payload with a `title` and `message` key:
@@ -78,9 +83,20 @@ Send a JSON payload with a `title` and `message` key:
 ```json
 {
   "title": "Front Door Opened",
-  "message": "The main entrance door sensor was triggered at 16:20."
+  "message": "The main entrance door sensor was triggered at 16:20.",
+  "icon": "door",
+  "app": "Home Assistant"
 }
 ```
+
+| Field | Required | What it does |
+|---|---|---|
+| `title` | one of the two | first line, in bold |
+| `message` | one of the two | the text (up to 3 lines in the Glass and Aurora styles) |
+| `icon` | no | Glass and Aurora styles: one of `bell`, `info`, `warning`, `check`, `door`, `washer`, `dishwasher`, `home`, `light` (also `mdi:bell`, `mdi:door`…), or an emoji such as `"🔔"`. Missing or unknown: a bell |
+| `app` | no | the small line above the title (default `Home Assistant`) |
+
+A plain text payload (not JSON), or a JSON string or number, is shown as the message.
 
 ### 🏠 Home Assistant Automation Example
 
@@ -89,11 +105,12 @@ Add this action to any Home Assistant automation YAML:
 ```yaml
 action: mqtt.publish
 data:
-  topic: homeassistant/pc_giovanni/notify
+  topic: pc-notifier/notify
   payload: >-
     {
       "title": "Solar Power Peak",
-      "message": "Solar panel production exceeded 4.5 kW!"
+      "message": "Solar panel production exceeded 4.5 kW!",
+      "icon": "light"
     }
 ```
 
@@ -118,15 +135,15 @@ python main.py
 
 ### 2. Build Executable with PyInstaller
 ```bash
-pyinstaller --noconsole --onefile --icon=icon.ico --name="PC-MQTT-Notifier" main.py
+pyinstaller --noconfirm --onefile --windowed --icon=icon.ico --add-data "icon.png;." --add-data "icon.ico;." --add-data "locales;locales" --name "PC-MQTT-Notifier" main.py
 ```
 
 ### 3. Build Windows Installer with InnoSetup
 Compile the `setup.iss` script using **Inno Setup 6**:
 ```bash
-iscc setup.iss
+iscc /DMyAppVersion=1.1.0 setup.iss
 ```
-This generates `Output/PC-MQTT-Notifier-Setup-1.0.0.exe`.
+This generates `Output/PC-MQTT-Notifier-Setup.exe`. In the CI the version comes from the git tag (`v1.2.3` → `1.2.3`).
 
 ---
 
@@ -135,8 +152,10 @@ This generates `Output/PC-MQTT-Notifier-Setup-1.0.0.exe`.
 ```
 PC-MQTT-Notifier/
 ├── main.py                  # Core application (CTk GUI, MQTT client, pystray, auto-updater)
-├── requirements.txt         # Python dependencies
-├── config.json              # Saved configuration settings
+├── app_core.py              # Config, log, payloads, versions, update checks (no GUI)
+├── notification_styles.py   # Glass and Aurora styles drawn with Pillow, Windows helpers
+├── requirements.txt         # Python dependencies (pinned)
+├── CHANGELOG.md             # What changed in each version
 ├── icon.png / icon.ico      # Application icons
 ├── setup.iss                # InnoSetup installer configuration
 ├── scripts/VERIFY.ps1       # Checks downloads against SHA256SUMS.txt (shipped with each release)
@@ -158,7 +177,9 @@ PC-MQTT-Notifier/
 
 ## 🔐 Privacy & Security
 
-- **100% Local Connection**: Connects directly to your local or private MQTT broker. No telemetry or tracking.
+- **100% Local Connection**: Connects directly to your local or private MQTT broker. No telemetry or tracking. Optional TLS.
+- **Password**: stored in the Windows Credential Manager (moved there automatically from older `config.json` files).
+- **Updates verified**: the installer is run only if its SHA256 matches the release's `SHA256SUMS.txt`.
 - **Auto-Updates**: Update checks strictly poll public GitHub Releases via the official GitHub REST API.
 
 ---

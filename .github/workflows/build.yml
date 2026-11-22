@@ -14,28 +14,87 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      # Code signing: off until a certificate exists. To turn it on, add the
+      # repository secrets SIGNING_CERT_PFX (the .pfx in base64) and SIGNING_CERT_PASSWORD.
+      SIGNING_CERT_PFX: ${{ secrets.SIGNING_CERT_PFX }}
+      SIGNING_CERT_PASSWORD: ${{ secrets.SIGNING_CERT_PASSWORD }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.11'
-          
+
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
-          pip install pyinstaller
-          
+          pip install pyinstaller==6.21.0 ruff==0.16.0
+
+      - name: Checks (syntax, lint, translations)
+        shell: pwsh
+        run: |
+          python -m py_compile main.py app_core.py notification_styles.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          ruff check --select E9,F63,F7,F82,F401,F811,F841 main.py app_core.py notification_styles.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python -c "import json,sys; en=set(json.load(open('locales/en.json',encoding='utf-8'))); it=set(json.load(open('locales/it.json',encoding='utf-8'))); d=en^it; print('missing keys:', sorted(d)) if d else print('locales ok'); sys.exit(1 if d else 0)"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Version from the tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.release.tag_name || github.ref_name }}"
+          $current = (Select-String -Path main.py -Pattern '^APP_VERSION = "(.+)"$').Matches[0].Groups[1].Value
+          if ($tag -match '^v(\d+\.\d+\.\d+.*)$') {
+            $version = $Matches[1]
+            $text = [IO.File]::ReadAllText("main.py")
+            $text = [regex]::Replace($text, '(?m)^APP_VERSION = ".*"$', "APP_VERSION = `"$version`"")
+            [IO.File]::WriteAllText("main.py", $text, (New-Object System.Text.UTF8Encoding $false))
+          } else {
+            $version = $current
+          }
+          $written = (Select-String -Path main.py -Pattern '^APP_VERSION = "(.+)"$').Matches[0].Groups[1].Value
+          if ($written -ne $version) { Write-Error "APP_VERSION ($written) does not match the tag ($version)"; exit 1 }
+          Write-Output "Version: $version"
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       - name: Build with PyInstaller
         run: |
-          pyinstaller --noconfirm --onefile --windowed --icon=icon.ico --add-data "icon.png;." --add-data "locales;locales" --name "PC-MQTT-Notifier" main.py
-          
+          pyinstaller --noconfirm --onefile --windowed --icon=icon.ico --add-data "icon.png;." --add-data "icon.ico;." --add-data "locales;locales" --name "PC-MQTT-Notifier" main.py
+
+      - name: Sign the program (only with a certificate)
+        if: env.SIGNING_CERT_PFX != ''
+        shell: pwsh
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP "cert.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:SIGNING_CERT_PFX))
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          & $signtool.FullName sign /fd SHA256 /f $pfx /p $env:SIGNING_CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 dist\PC-MQTT-Notifier.exe
+          $code = $LASTEXITCODE
+          Remove-Item $pfx
+          if ($code -ne 0) { exit 1 }
+
       - name: Compile Inno Setup Installer
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        uses: Minionguyjpro/Inno-Setup-Action@b8e8eb5936437c243592fda645c96dfc6488c275 # v1.2.2
         with:
           path: setup.iss
+          options: /DMyAppVersion=${{ steps.version.outputs.version }}
+
+      - name: Sign the installer (only with a certificate)
+        if: env.SIGNING_CERT_PFX != ''
+        shell: pwsh
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP "cert.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:SIGNING_CERT_PFX))
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          & $signtool.FullName sign /fd SHA256 /f $pfx /p $env:SIGNING_CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 Output\PC-MQTT-Notifier-Setup.exe
+          $code = $LASTEXITCODE
+          Remove-Item $pfx
+          if ($code -ne 0) { exit 1 }
 
       - name: SHA256SUMS.txt and VERIFY.ps1
         shell: pwsh
@@ -47,7 +106,7 @@ jobs:
           Get-Content Output/SHA256SUMS.txt
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: PC-MQTT-Notifier-Setup
           path: |
@@ -56,7 +115,7 @@ jobs:
             Output/VERIFY.ps1
 
       - name: Upload Installer to Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
