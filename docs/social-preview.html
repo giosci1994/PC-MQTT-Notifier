@@ -2,7 +2,8 @@
 <!-- Source of docs/social-preview.png (1280x640), the GitHub social preview.
      Regenerate (Firefox, any OS), from the folder of this file:
        firefox --headless --window-size=1280,640 --screenshot social-preview.png social-preview.html
-     Same design system as the other projects (Arborae palette, Space Grotesk / Inter / JetBrains Mono). -->
+     Same design as the landing (Arborae ink-green ramp, Inter / JetBrains Mono). The notification
+     is styles/social-glass-soft-dark.webp, drawn by notification_styles.CardRenderer (Glass, Soft glow). -->
 <html lang="en">
 
 <head>
@@ -10,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,148 +20,104 @@
 
     body {
       font-family: "Inter", "Segoe UI", system-ui, sans-serif;
-      color: #eef4f2;
-      background:
-        radial-gradient(900px 560px at 85% -15%, rgba(0, 181, 133, 0.22), transparent 60%),
-        radial-gradient(800px 520px at 0% 120%, rgba(95, 179, 166, 0.14), transparent 60%),
-        #070b0a;
-      position: relative;
-    }
-
-    body::before {
-      content: "";
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(1000px 620px at 50% 30%, #000 50%, transparent 100%);
+      color: #ecf1ef;
+      background: #0a0d0c;
     }
 
     .wrap {
-      position: relative;
       height: 100%;
       padding: 64px 72px;
       display: grid;
-      grid-template-columns: 1fr 470px;
+      grid-template-columns: 1fr 540px;
       gap: 48px;
+      align-items: center;
     }
 
-    .left { display: flex; flex-direction: column; }
+    .left { display: flex; flex-direction: column; height: 100%; }
 
-    .kicker {
-      display: inline-flex; align-items: center; gap: 12px;
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 18px; font-weight: 600;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: #34d399;
+    .brand { display: flex; align-items: center; gap: 16px; font-size: 24px; font-weight: 600; }
+
+    .mark {
+      position: relative;
+      width: 44px; height: 32px;
+      border-radius: 9px;
+      background: #00b585;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
     }
-    .kicker .dot { width: 11px; height: 11px; border-radius: 50%; background: #34d399; box-shadow: 0 0 16px #34d399; }
+    .mark::before, .mark::after, .mark i { content: ""; position: absolute; background: #04110d; }
+    .mark::before { left: 7px; top: 7px; width: 11px; height: 11px; border-radius: 3px; }
+    .mark::after { left: 22px; top: 9px; width: 16px; height: 4px; border-radius: 2px; }
+    .mark i { left: 7px; bottom: 6px; width: 20px; height: 3px; border-radius: 2px; }
 
     h1 {
-      margin-top: 26px;
-      font-family: "Space Grotesk", "Segoe UI", sans-serif;
-      font-size: 78px; font-weight: 700;
-      line-height: 1; letter-spacing: -2px;
+      margin-top: 56px;
+      font-size: 64px; font-weight: 500;
+      line-height: 1.04; letter-spacing: -0.03em;
     }
-
-    .sub {
-      margin-top: 18px;
-      font-family: "Space Grotesk", "Segoe UI", sans-serif;
-      font-size: 36px; font-weight: 600;
-      color: #9db3ad; line-height: 1.2;
-    }
-    .sub b {
-      background: linear-gradient(120deg, #34d399, #5fb3a6);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    h1 span { color: #3ecf9f; }
 
     .desc {
-      margin-top: 22px;
-      max-width: 600px;
+      margin-top: 24px;
+      max-width: 560px;
       font-size: 22px; line-height: 1.5;
-      color: #b6c8c2;
+      color: #a3b1ac;
     }
 
-    .bottom { margin-top: auto; }
-
-    .badges { display: flex; gap: 12px; flex-wrap: wrap; }
-    .badge {
-      padding: 10px 18px;
-      font-size: 19px; font-weight: 600;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #dbe7e3;
-    }
-    .badge.win { border-color: rgba(76, 194, 255, 0.5); color: #8fd6ff; }
-    .badge.green { border-color: rgba(0, 181, 133, 0.5); color: #34d399; }
-
-    .repo {
-      margin-top: 22px;
+    .meta {
+      margin-top: auto;
+      display: flex; gap: 12px; flex-wrap: wrap;
       font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 20px; color: #64756f;
+      font-size: 17px; color: #7d8a85;
     }
-    .repo b { color: #eef4f2; font-weight: 600; }
-
-    .right { display: flex; align-items: center; }
+    .meta span { padding: 6px 12px; border: 1px solid rgba(236, 241, 239, 0.12); border-radius: 6px; }
 
     .window {
       width: 100%;
-      background: rgba(10, 16, 15, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
+      background: #111614;
+      border: 1px solid rgba(236, 241, 239, 0.08);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 40px 80px -24px rgba(0, 0, 0, 0.7), 0 0 90px -30px rgba(0, 181, 133, 0.35);
-      transform: perspective(1400px) rotateY(-6deg) rotateX(2deg);
     }
-
     .bar {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 20px;
-      background: rgba(255, 255, 255, 0.03);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      height: 48px; padding: 0 20px;
+      background: #171d1b;
+      border-bottom: 1px solid rgba(236, 241, 239, 0.08);
       font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 15px; color: #64756f;
+      font-size: 15px; color: #7d8a85;
     }
-
-
-    .badges { flex-wrap: nowrap; gap: 10px; }
-    .badge { font-size: 17px; padding: 9px 15px; white-space: nowrap; }
-
-    .shot { display:block; width:100%; padding:22px; background:#0b0f0e; } .shot img { display:block; width:100%; border-radius:14px; }
-    .payload { padding: 0 22px 22px; font-family:'JetBrains Mono',monospace; font-size:15px; color:#9db3ad; line-height:1.5; } .payload b { color:#34d399; font-weight:600; }
-    h1 { font-size: 64px; white-space: nowrap; }
+    .bar b { font-weight: 400; display: inline-flex; align-items: center; gap: 8px; }
+    .bar b::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #00b585; }
+    .desk { padding: 28px 8px 12px; background: #0d1110; }
+    .desk img { display: block; width: 100%; }
+    .payload {
+      padding: 20px;
+      border-top: 1px solid rgba(236, 241, 239, 0.08);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 15px; line-height: 1.6; color: #cfe0da;
+    }
+    .payload b { color: #3ecf9f; font-weight: 400; }
   </style>
 </head>
 
 <body>
   <div class="wrap">
     <div class="left">
-      <span class="kicker"><span class="dot"></span> Windows · MQTT · Home Assistant</span>
-      <h1>PC-MQTT-Notifier</h1>
-      <div class="sub">Your notifications, <b>your way</b>.</div>
+      <div class="brand"><span class="mark"><i></i></span>PC-MQTT-Notifier</div>
+      <h1>Desktop notifications from <span>MQTT</span></h1>
       <div class="desc">
         A lightweight Windows overlay for MQTT messages from Home Assistant, Node-RED or any script.
+        Four styles: Windows 11 Glass, Soft Aurora, Classic, Static.
       </div>
-
-      <div class="bottom">
-        <div class="badges">
-          <span class="badge win">🪟 Windows</span>
-          <span class="badge ">Python</span>
-          <span class="badge green">MQTT</span>
-          <span class="badge ">GPLv3</span>
-        </div>
-        <div class="repo"><b>github.com/giosci1994</b>/PC-MQTT-Notifier</div>
+      <div class="meta">
+        <span>Windows</span><span>Python</span><span>MQTT</span><span>GPLv3</span>
       </div>
     </div>
 
-    <div class="right">
-      <div class="window">
-        <div class="bar"><span>homeassistant/…/notify</span><span>● MQTT</span></div>
-        <div class="shot"><img src="dark_pop-up_fluid.png" alt="" /></div>
-        <div class="payload">{ <b>"title"</b>: "Front door opened",<br>&nbsp;&nbsp;<b>"message"</b>: "Triggered at 16:20." }</div>
-      </div>
+    <div class="window">
+      <div class="bar"><span>pc-notifier/notify</span><b>MQTT</b></div>
+      <div class="desk"><img src="styles/social-glass-soft-dark.webp" alt="" /></div>
+      <div class="payload">{ <b>"title"</b>: "Washing machine",<br>&nbsp;&nbsp;<b>"message"</b>: "Cycle finished, ready to unload.",<br>&nbsp;&nbsp;<b>"icon"</b>: "washer" }</div>
     </div>
   </div>
 </body>

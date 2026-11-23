@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#070b0a" />
+  <meta name="color-scheme" content="dark light" />
   <meta name="description"
     content="PC-MQTT-Notifier — A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics." />
   <title>PC-MQTT-Notifier — Desktop Notification Overlay</title>
@@ -17,14 +19,30 @@
   <meta property="og:url" content="https://giosci1994.github.io/PC-MQTT-Notifier/" />
   <meta property="og:image" content="https://giosci1994.github.io/PC-MQTT-Notifier/social-preview.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='6' width='28' height='20' rx='6' fill='%2300b585'/%3E%3Crect x='6' y='10' width='7' height='7' rx='2' fill='%2304110d'/%3E%3Crect x='15' y='11' width='11' height='2.5' rx='1.25' fill='%2304110d'/%3E%3Crect x='6' y='20.5' width='13' height='2' rx='1' fill='%2304110d'/%3E%3C/svg%3E" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
+  <script>
+    /* Entrance animation only when motion is allowed. If Motion never loads, the class is removed and nothing stays hidden. */
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+      var root = document.documentElement;
+      root.classList.add('motion-ready');
+      window.__pmnReveal = setTimeout(function () { root.classList.remove('motion-ready'); }, 1500);
+    })();
+  </script>
   <link rel="stylesheet" href="./css/style.css" />
+  <!-- Optional motion (motion.dev). The page works the same without it. -->
+  <script src="https://cdn.jsdelivr.net/npm/motion@14.10.1/dist/motion.js" defer
+    integrity="sha384-lnXs/o2QVHbH7aNA9JGkcMdW38AWVgMHWWrPU/fGgHi+eRj2j0a8va/1nlijpjHX" crossorigin="anonymous"
+    onerror="document.documentElement.classList.remove('motion-ready')"></script>
   <script src="./js/main.js" defer></script>
 </head>
 
@@ -37,18 +55,24 @@
     <div class="container nav-inner">
       <div class="brand">
         <a class="brand-main" href="#top" aria-label="PC-MQTT-Notifier Home">
+          <span class="note-mark" aria-hidden="true"><i></i></span>
           <span>PC-MQTT-Notifier</span>
         </a>
       </div>
 
-      <nav class="nav-links" aria-label="Primary">
+      <nav id="primary-nav" class="nav-links" aria-label="Primary">
         <a href="#features" data-en="Features" data-it="Funzionalità">Features</a>
+        <a href="#styles" data-en="Styles" data-it="Stili">Styles</a>
         <a href="#screenshots" data-en="Screenshots" data-it="Schermate">Screenshots</a>
         <a href="#quickstart" data-en="Quick Start" data-it="Guida Rapida">Quick Start</a>
       </nav>
 
       <div class="nav-cta">
-        <button id="lang-toggle" class="btn ghost small">🇮🇹 IT</button>
+        <button id="menu-toggle" class="btn ghost small menu-btn" type="button" aria-expanded="false"
+          aria-controls="primary-nav" aria-label="Open menu" hidden>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path class="i-open" d="M4 7h16M4 12h16M4 17h16"/><path class="i-close" d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <button id="lang-toggle" class="btn ghost small lang-btn" type="button" aria-label="Passa all'italiano">IT</button>
         <a class="btn primary small" href="https://github.com/giosci1994/PC-MQTT-Notifier" target="_blank"
           rel="noreferrer">GitHub</a>
       </div>
@@ -57,18 +81,18 @@
 
   <main id="top" class="container">
     <section class="hero">
-      <div class="hero-left">
+      <div class="hero-left reveal">
         <div class="kicker">
           <span class="dot"></span>
           <span data-en="Open Source Application" data-it="Applicazione Open Source">Open Source Application</span>
         </div>
 
-        <h1 data-en='Desktop notifications, <span class="accent-text">reinvented</span>.' data-it='Notifiche desktop, <span class="accent-text">reinventate</span>.'>
-          Desktop notifications, <span class="accent-text">reinvented</span>.
+        <h1 data-en='Desktop notifications, <span class="accent-text">reinvented</span>' data-it='Notifiche desktop, <span class="accent-text">reinventate</span>'>
+          Desktop notifications, <span class="accent-text">reinvented</span>
         </h1>
 
-        <p class="lead" data-en="A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics and displays floating notifications with a beautiful fluid background." data-it="Un'applicazione per Windows leggera e personalizzabile che riceve messaggi via MQTT e mostra bellissime notifiche fluttuanti con sfondo animato.">
-          A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics and displays floating notifications with a beautiful fluid background.
+        <p class="lead" data-en="A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics and displays floating notifications in four styles: Windows 11 Glass by default, Soft Aurora, Classic and Static." data-it="Un'applicazione per Windows leggera e personalizzabile che riceve messaggi via MQTT e mostra notifiche fluttuanti in quattro stili: Vetro Windows 11 di partenza, Aurora morbida, Classico e Statico.">
+          A lightweight, customizable, and non-invasive Windows desktop application that listens to MQTT topics and displays floating notifications in four styles: Windows 11 Glass by default, Soft Aurora, Classic and Static.
         </p>
 
         <div class="hero-actions">
@@ -86,12 +110,24 @@
         </div>
       </div>
 
-      <div class="hero-right" aria-hidden="true">
+      <div class="hero-right reveal" aria-hidden="true">
         <div class="window">
           <div class="win-bar">
             <span class="win-title">pc-mqtt-notifier — popup</span>
+            <span class="win-controls"><svg viewBox="0 0 36 32"><path d="M13 16h10"/></svg><svg viewBox="0 0 36 32"><rect x="13" y="11" width="10" height="10" rx="1"/></svg><svg viewBox="0 0 36 32"><path d="M13 11l10 10M23 11 13 21"/></svg></span>
           </div>
-          <img src="./dark_pop-up_fluid.png" alt="PC-MQTT-Notifier Popup" loading="lazy" />
+          <div class="desk">
+            <picture>
+              <source srcset="./styles/style-glass-soft-light.webp" media="(prefers-color-scheme: light)" />
+              <img src="./styles/style-glass-soft-dark.webp" width="678" height="242" alt="PC-MQTT-Notifier Popup" />
+            </picture>
+          </div>
+          <div class="payload">
+            <span class="payload-topic">pc-notifier/notify</span>
+<pre><code>{ "title": "Washing machine",
+  "message": "Cycle finished, ready to unload.",
+  "icon": "washer" }</code></pre>
+          </div>
         </div>
       </div>
     </section>
@@ -105,41 +141,100 @@
 
       <div class="cards-grid">
         <article class="card reveal">
-          <span class="card-icon">🌊</span>
-          <h3 data-en="Fluid Background" data-it="Sfondo Fluido">Fluid Background</h3>
-          <p data-en="Gorgeous animated mesh gradients powered by optimized calculations. Uses 0% CPU when static mode is enabled." data-it="Sfondi animati a gradiente per un look premium. Consumo di CPU azzerato se disabilitato.">Gorgeous animated mesh gradients powered by optimized calculations. Uses 0% CPU when static mode is enabled.</p>
+          <span class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg></span>
+          <h3 data-en="Four Notification Styles" data-it="Quattro stili di notifica">Four Notification Styles</h3>
+          <p data-en="Windows 11 Glass with a Soft or Full glow (new installs: Soft), Soft Aurora with three palettes, and the animated Classic. Static uses 0% CPU." data-it="Vetro Windows 11 con alone Leggero o Pieno (di partenza Leggero), Aurora morbida con tre palette e il Classico animato. Statico usa lo 0% di CPU.">Windows 11 Glass with a Soft or Full glow (new installs: Soft), Soft Aurora with three palettes, and the animated Classic. Static uses 0% CPU.</p>
         </article>
 
         <article class="card reveal">
-          <span class="card-icon">🎨</span>
+          <span class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></svg></span>
           <h3 data-en="Highly Customizable" data-it="Altamente Personalizzabile">Highly Customizable</h3>
-          <p data-en="Change scale, transparency, corner radius, and theme (Dark/Light). Make it look exactly how you want." data-it="Modifica grandezza, trasparenza, angoli e tema. Rendi l'app esattamente come la desideri.">Change scale, transparency, corner radius, and theme (Dark/Light). Make it look exactly how you want.</p>
+          <p data-en="Change scale, transparency, corner radius, and theme (Dark, Light or Same as Windows). Make it look exactly how you want." data-it="Modifica grandezza, trasparenza, angoli e tema (Scuro, Chiaro o Come Windows). Rendi l'app esattamente come la desideri.">Change scale, transparency, corner radius, and theme (Dark, Light or Same as Windows). Make it look exactly how you want.</p>
         </article>
 
         <article class="card reveal">
-          <span class="card-icon">🌍</span>
+          <span class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg></span>
           <h3 data-en="Bilingual (i18n)" data-it="Bilingue (i18n)">Bilingual (i18n)</h3>
           <p data-en="Fully translated in English and Italian. Want another language? Just drop a JSON file in the locales folder!" data-it="Tradotto nativamente in Italiano e Inglese. Aggiungi nuove lingue inserendo un file JSON.">Fully translated in English and Italian. Want another language? Just drop a JSON file in the locales folder!</p>
         </article>
 
         <article class="card reveal">
-          <span class="card-icon">⚙️</span>
+          <span class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5"/></svg></span>
           <h3 data-en="System Tray & Auto-Updater" data-it="System Tray e Auto-Update">System Tray & Auto-Updater</h3>
           <p data-en="Sits quietly in your system tray. Built-in auto-updater ensures you are always running the latest release." data-it="Gira silenziosamente in background. Un sistema di aggiornamento automatico ti avviserà delle nuove versioni.">Sits quietly in your system tray. Built-in auto-updater ensures you are always running the latest release.</p>
         </article>
 
         <article class="card reveal">
-          <span class="card-icon">🔌</span>
+          <span class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22v-5M9 8V2M15 8V2M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span>
           <h3 data-en="MQTT Integration" data-it="Integrazione MQTT">MQTT Integration</h3>
           <p data-en="Connect seamlessly with Home Assistant, Node-RED, or any custom MQTT broker on your local network." data-it="Connettiti nativamente a Home Assistant, Node-RED o qualsiasi broker MQTT locale.">Connect seamlessly with Home Assistant, Node-RED, or any custom MQTT broker on your local network.</p>
         </article>
 
         <article class="card reveal">
-          <span class="card-icon">📦</span>
+          <span class="card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73zM12 22V12M3.3 7 12 12l8.7-5"/></svg></span>
           <h3 data-en="Standalone Executable" data-it="Eseguibile Standalone">Standalone Executable</h3>
           <p data-en="Packaged with PyInstaller and InnoSetup installer for simple one-click installation on Windows." data-it="Compilato con PyInstaller e installer InnoSetup per un'installazione immediata su Windows.">Packaged with PyInstaller and InnoSetup installer for simple one-click installation on Windows.</p>
         </article>
       </div>
+    </section>
+
+    <section id="styles" class="section">
+      <div class="section-head reveal">
+        <span class="section-label" data-en="// styles" data-it="// stili">// styles</span>
+        <h2 data-en="Two new notification styles" data-it="Due nuovi stili di notifica">Two new notification styles</h2>
+        <p data-en="Since version 1.1.0 you choose the look in Settings, under Notification Style. Classic and Static are still there." data-it="Dalla versione 1.1.0 l'aspetto si sceglie nelle Impostazioni, alla voce Stile notifica. Classico e Statico restano.">Since version 1.1.0 you choose the look in Settings, under Notification Style. Classic and Static are still there.</p>
+      </div>
+
+      <div class="theme-row reveal">
+        <p data-en="Each style follows the notification theme: Dark, Light or Same as Windows, which reads the Windows app theme for every notification." data-it="Ogni stile segue il tema della notifica: Scuro, Chiaro o Come Windows, che legge il tema delle app di Windows a ogni notifica.">Each style follows the notification theme: Dark, Light or Same as Windows, which reads the Windows app theme for every notification.</p>
+        <div class="seg" id="theme-seg" role="group" aria-label="Theme" hidden>
+          <button type="button" data-theme="dark" aria-pressed="false" data-en="Dark" data-it="Scuro">Dark</button>
+          <button type="button" data-theme="light" aria-pressed="false" data-en="Light" data-it="Chiaro">Light</button>
+        </div>
+      </div>
+
+      <div class="styles-grid">
+        <article class="style-panel reveal" data-variant="glass-soft">
+          <div class="style-head">
+            <span class="style-letter">B</span>
+            <h3 data-en="Windows 11 Glass" data-it="Vetro Windows 11">Windows 11 Glass</h3>
+          </div>
+          <p data-en="A tinted card with a thin animated rainbow border and a glow around it, Full or Soft. New installs start with Glass and the Soft glow." data-it="Una scheda in tinta unita con un sottile bordo arcobaleno animato e un alone attorno, Pieno o Leggero. Le installazioni nuove partono con Vetro e alone Leggero.">A tinted card with a thin animated rainbow border and a glow around it, Full or Soft. New installs start with Glass and the Soft glow.</p>
+          <div class="style-stage">
+            <picture>
+              <source srcset="./styles/style-glass-soft-light.webp" media="(prefers-color-scheme: light)" />
+              <img src="./styles/style-glass-soft-dark.webp" width="678" height="242" alt="Windows 11 Glass notification, Soft glow" loading="lazy" />
+            </picture>
+          </div>
+          <div class="chips" role="group" aria-label="Glow" hidden>
+            <button type="button" data-variant="glass-soft" aria-pressed="true" data-en="Soft" data-it="Leggero">Soft</button>
+            <button type="button" data-variant="glass-full" aria-pressed="false" data-en="Full" data-it="Pieno">Full</button>
+          </div>
+          <p class="options"><span data-en="Glow: Full, Soft" data-it="Alone: Pieno, Leggero">Glow: Full, Soft</span></p>
+        </article>
+
+        <article class="style-panel reveal" data-variant="aurora-night">
+          <div class="style-head">
+            <span class="style-letter">A</span>
+            <h3 data-en="Soft Aurora" data-it="Aurora morbida">Soft Aurora</h3>
+          </div>
+          <p data-en="Three colour blobs move slowly behind the text. Three palettes: Night, Sunset and Forest." data-it="Tre macchie di colore si muovono piano dietro il testo. Tre palette: Notte, Tramonto e Bosco.">Three colour blobs move slowly behind the text. Three palettes: Night, Sunset and Forest.</p>
+          <div class="style-stage">
+            <picture>
+              <source srcset="./styles/style-aurora-night-light.webp" media="(prefers-color-scheme: light)" />
+              <img src="./styles/style-aurora-night-dark.webp" width="678" height="242" alt="Soft Aurora notification, Night palette" loading="lazy" />
+            </picture>
+          </div>
+          <div class="chips" role="group" aria-label="Palette" hidden>
+            <button type="button" data-variant="aurora-night" aria-pressed="true" data-en="Night" data-it="Notte">Night</button>
+            <button type="button" data-variant="aurora-sunset" aria-pressed="false" data-en="Sunset" data-it="Tramonto">Sunset</button>
+            <button type="button" data-variant="aurora-forest" aria-pressed="false" data-en="Forest" data-it="Bosco">Forest</button>
+          </div>
+          <p class="options"><span data-en="Palette: Night, Sunset, Forest" data-it="Palette: Notte, Tramonto, Bosco">Palette: Night, Sunset, Forest</span></p>
+        </article>
+      </div>
+
+      <p class="styles-note reveal" data-en="Both show an icon, the app name and the time, and a bar with the time left; a click closes them. Previews drawn by the app's own code; on Windows the font is Segoe UI." data-it="Tutti e due mostrano un'icona, il nome dell'app e l'ora, e una barra con il tempo che resta; un clic le chiude. Anteprime disegnate dal codice dell'app; su Windows il carattere è Segoe UI.">Both show an icon, the app name and the time, and a bar with the time left; a click closes them. Previews drawn by the app's own code; on Windows the font is Segoe UI.</p>
     </section>
 
     <section id="screenshots" class="section">
@@ -155,7 +250,25 @@
             <div class="win-bar">
               <span class="win-title">settings</span>
             </div>
-            <img src="./settings.png" alt="Settings Window" loading="lazy" />
+            <div class="settings-list">
+              <p class="set-note" data-en="Values of a new install" data-it="Valori di un'installazione nuova">Values of a new install</p>
+              <p class="set-group" data-en="MQTT Network" data-it="Rete MQTT">MQTT Network</p>
+              <dl>
+                <dt data-en="Broker" data-it="Broker">Broker</dt><dd>—</dd>
+                <dt data-en="Port" data-it="Porta">Port</dt><dd>1883</dd>
+                <dt data-en="Topic" data-it="Topic">Topic</dt><dd>pc-notifier/notify</dd>
+                <dt data-en="TLS (port 8883)" data-it="TLS (porta 8883)">TLS (port 8883)</dt><dd data-en="Off" data-it="Spento">Off</dd>
+                <dt data-en="Password" data-it="Password">Password</dt><dd data-en="Windows Credential Manager" data-it="Gestore credenziali di Windows">Windows Credential Manager</dd>
+              </dl>
+              <p class="set-group" data-en="Appearance and Notifications" data-it="Aspetto e notifiche">Appearance and Notifications</p>
+              <dl>
+                <dt data-en="Style" data-it="Stile">Style</dt><dd data-en="Windows 11 Glass" data-it="Vetro Windows 11">Windows 11 Glass</dd>
+                <dt data-en="Glow" data-it="Alone">Glow</dt><dd data-en="Soft" data-it="Leggero">Soft</dd>
+                <dt data-en="Theme" data-it="Tema">Theme</dt><dd data-en="Dark" data-it="Scuro">Dark</dd>
+                <dt data-en="Duration" data-it="Durata">Duration</dt><dd>5 s</dd>
+                <dt data-en="Position" data-it="Posizione">Position</dt><dd data-en="Top center" data-it="In alto al centro">Top center</dd>
+              </dl>
+            </div>
           </div>
           <figcaption data-en="Settings Dashboard" data-it="Pannello Impostazioni">Settings Dashboard</figcaption>
         </figure>
@@ -189,17 +302,17 @@
         <p data-en="Run the pre-compiled installer or launch directly from Python source code." data-it="Esegui l'installer compilato o avvia direttamente dal codice sorgente Python.">Run the pre-compiled installer or launch directly from Python source code.</p>
       </div>
 
-      <div class="quickstart reveal" style="background: var(--bg-soft); border: 1px solid var(--border); padding: 32px; border-radius: var(--radius-lg);">
-        <p style="color: var(--text); font-weight: 600; margin-bottom: 16px;" data-en="Option 1: Pre-compiled Installer (.exe)" data-it="Opzione 1: Installer Compilato (.exe)">Option 1: Pre-compiled Installer (.exe)</p>
+      <div class="quickstart reveal">
+        <p class="qs-title" data-en="Option 1: Pre-compiled Installer (.exe)" data-it="Opzione 1: Installer Compilato (.exe)">Option 1: Pre-compiled Installer (.exe)</p>
         <p data-en="Download the latest release executable from GitHub and follow the setup wizard." data-it="Scarica l'eseguibile dell'ultima versione da GitHub e segui la procedura guidata.">Download the latest release executable from GitHub and follow the setup wizard.</p>
-        <div style="margin: 20px 0;">
+        <div class="qs-action">
           <a class="btn primary" href="https://github.com/giosci1994/PC-MQTT-Notifier/releases/latest" data-en="Download Latest Installer (.exe)" data-it="Scarica Ultimo Installer (.exe)">Download Latest Installer (.exe)</a>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 32px 0;" />
+        <hr class="qs-rule" />
 
-        <p style="color: var(--text); font-weight: 600; margin-bottom: 16px;" data-en="Option 2: Run from Source Code" data-it="Opzione 2: Esegui da Codice Sorgente">Option 2: Run from Source Code</p>
-        <div class="code-block" style="background: #040807; padding: 20px; border-radius: 12px; font-family: var(--font-mono); font-size: 0.9rem; color: #34d399; overflow-x: auto; border: 1px solid var(--border);">
+        <p class="qs-title" data-en="Option 2: Run from Source Code" data-it="Opzione 2: Esegui da Codice Sorgente">Option 2: Run from Source Code</p>
+        <div class="code-block">
 <pre><code># Clone repository
 git clone https://github.com/giosci1994/PC-MQTT-Notifier.git
 cd PC-MQTT-Notifier
@@ -214,8 +327,9 @@ python main.py</code></pre>
     </section>
   </main>
 
-  <footer style="border-top: 1px solid var(--border); padding: 40px 0; margin-top: 80px; text-align: center; color: var(--muted); font-size: 0.9rem;">
-    <div class="container">
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span class="note-mark small" aria-hidden="true"><i></i></span>
       <p>© <span id="year">2026</span> Arborae / giosci1994. Released under the GPLv3 License.</p>
     </div>
   </footer>

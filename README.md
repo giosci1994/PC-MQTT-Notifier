@@ -37,8 +37,6 @@ Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) 
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="docs/settings.png" width="320" alt="Settings Dashboard" />
-  &nbsp;&nbsp;
   <img src="docs/dark_pop-up_fluid.png" width="400" alt="Dark Theme Notification Popup" />
 </p>
 
