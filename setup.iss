@@ -1,6 +1,6 @@
 ; The CI passes the version from the git tag: iscc /DMyAppVersion=1.2.3 setup.iss
 #ifndef MyAppVersion
-  #define MyAppVersion "1.1.1"
+  #define MyAppVersion "1.2.0"
 #endif
 
 [Setup]

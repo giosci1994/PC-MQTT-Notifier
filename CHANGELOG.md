@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0
+
+### New
+- **One new shape for every style**, taken from the Spotify widget: a 52 px icon tile in the accent colour, a small upper-case app line with the time, a bold title on up to 2 lines, the message on up to 3 lines, and a thicker bar with the time left.
+- Three new styles: **Ambient** (soft cover-like colours), **Poster** (a sharp drawn scene: waves, mountains or a sunset) and **Vinyl** (an orange sleeve with a turning record and a serif title). Ambient and Poster pick their look from the notification `icon` by themselves (an emoji or an unknown icon: from the title); nothing is downloaded.
+- Every style has a dark and a light version, Poster and Vinyl included.
+
+### Changed
+- **Classic** keeps its animated rainbow background and **Static** is now neutral grey; both are drawn like the other styles, with smooth corners, a shadow and per-pixel transparency.
+- After an update you keep your style (`glass`, `aurora`, `classic`, `static`) and all your settings; new installs still start with Glass and the soft glow.
+- Glass glow redrawn (Soft lighter, Full stronger); Aurora colours a little brighter.
+
 ## 1.1.1
 
 ### Fixed
