@@ -11,13 +11,11 @@ import subprocess
 import tempfile
 import paho.mqtt.client as mqtt
 import customtkinter as ctk
-from PIL import Image, ImageTk, ImageDraw
+from PIL import Image, ImageTk
 import pystray
 from pystray import MenuItem as item
 import pywinstyles
-import colorsys
 import tkinter as tk
-import math
 from datetime import datetime
 import notification_styles as nstyles
 import app_core
@@ -25,7 +23,7 @@ import app_core
 log = app_core.log
 ICON_FILE = app_core.resource_path("icon.png")
 ICON_ICO = app_core.resource_path("icon.ico")
-APP_VERSION = "1.1.1"
+APP_VERSION = "1.2.0"
 REPO_NAME = "giosci1994/PC-MQTT-Notifier"
 GITHUB_API_URL = f"https://api.github.com/repos/{REPO_NAME}/releases/latest"
 
@@ -225,8 +223,11 @@ class SettingsWindow(ctk.CTkToplevel):
         self.e_style = self.create_choice("notification_style", [
             ("glass", _("style_glass", "Windows 11 Glass")),
             ("aurora", _("style_aurora", "Soft Aurora")),
-            ("classic", _("style_classic", "Classic (rainbow)")),
+            ("classic", _("style_classic", "Classic")),
             ("static", _("style_static", "Static")),
+            ("ambient", _("style_ambient", "Ambient")),
+            ("poster", _("style_poster", "Poster")),
+            ("vinyl", _("style_vinyl", "Vinyl")),
         ], current_config.get("notification_style", nstyles.DEFAULT_STYLE),
             command=lambda _v: self.update_variant_row())
         self.e_style.grid(row=15, column=1, padx=(0, 15), pady=8, sticky="ew")
@@ -360,10 +361,11 @@ class SettingsWindow(ctk.CTkToplevel):
         self.destroy()
 
 class StyledPopup:
-    """One notification in style A (aurora) or B (glass), drawn with Pillow.
+    """One notification in any style (glass, aurora, classic, static, ambient,
+    poster, vinyl), drawn with Pillow by notification_styles.CardRenderer.
 
     On Windows the window has per-pixel alpha (UpdateLayeredWindow): smooth
-    corners, shadow and glow. Style B ("glass") uses only this layered window
+    corners, shadow and glow. The glass style uses only this layered window
     (no separate acrylic backdrop window, because on Windows 11 DWM ignores
     SetWindowRgn with ACCENT_ENABLE_ACRYLICBLURBEHIND).
     If something fails (or not on Windows) it falls back to the old way:
@@ -499,7 +501,8 @@ class StyledPopup:
         else:
             e = elapsed / self.ENTER
             alpha = self.alpha * min(1.0, elapsed / self.FADE_IN)
-            dy = -18 * s * (1 - nstyles.ease_out_back(e))
+            # the static style only fades in, the others also slide down
+            dy = 0 if self.renderer.style == "static" else -18 * s * (1 - nstyles.ease_out_back(e))
         try:
             img = self.renderer.frame(elapsed, 1.0 - elapsed / self.duration)
             x, y = self.window_pos(dy)
@@ -546,7 +549,6 @@ class StyledPopup:
 
 class MainApplication(ctk.CTk):
     QUEUE_LIMIT = 10
-    KEY = "#000001"
 
     def __init__(self):
         super().__init__()
@@ -563,13 +565,7 @@ class MainApplication(ctk.CTk):
         self.next_show_at = 0.0
         self.quitting = False
         
-        self.notify_window = None
-        self.fading_window = None
         self.hide_task = None
-        self.fade_task = None
-        self.rainbow_task = None
-        self.rainbow_base = None
-        self.rainbow_key = None
         self.styled_popup = None
         self.settings_window = None
         self.tray_icon = None
@@ -684,194 +680,6 @@ class MainApplication(ctk.CTk):
             style = "static" if cfg.get("enable_fluid", True) is False else nstyles.DEFAULT_STYLE
         return style
 
-    def generate_rainbow_base(self, width=420, height=135):
-        # Big fluid background for the classic style, at least twice the notification
-        bw, bh = max(1200, int(width * 2.2)), max(600, int(height * 3))
-        self.rainbow_key = (self.notify_dark, bw, bh)
-        # Generiamo una mappa di "Rumore 2D" organica a bassa risoluzione (super veloce)
-        w, h = 150, 150
-        base = Image.new("RGB", (w, h))
-        pixels = base.load()
-        
-        is_dark = self.notify_dark
-        
-        for x in range(w):
-            for y in range(h):
-                # Onde matematiche incrociate per creare un fluido
-                nx = x / 25.0
-                ny = y / 25.0
-                v = math.sin(nx + ny) + math.sin(nx * 0.6 - ny * 1.2) + math.cos(nx * 0.9 + ny * 0.7)
-                val = (v + 3) / 6.0 # Normalizzato ~ 0-1
-                
-                # Mappiamo il fluido in un gradiente di colori
-                hue = (val * 1.5) % 1.0
-                
-                if is_dark:
-                    # Colori profondi tipo aurora boreale
-                    r, g, b = colorsys.hsv_to_rgb(hue, 0.65, 0.35)
-                else:
-                    # Colori pastello fluidi, stile mesh gradient
-                    r, g, b = colorsys.hsv_to_rgb(hue, 0.45, 0.98)
-                    
-                pixels[x, y] = (int(r*255), int(g*255), int(b*255))
-                
-        # Ingrandiamo l'immagine con filtro Bicubic per creare una sfumatura "Mesh Gradient" perfetta e fluidissima
-        self.rainbow_base = base.resize((bw, bh), Image.Resampling.BICUBIC)
-
-    def cancel_classic(self):
-        # Stops everything of the classic/static window: animation, fades, the window
-        for name in ("rainbow_task", "fade_task"):
-            task = getattr(self, name)
-            if task:
-                try:
-                    self.after_cancel(task)
-                except Exception:
-                    pass
-                setattr(self, name, None)
-        for name in ("notify_window", "fading_window"):
-            win = getattr(self, name)
-            if win is not None:
-                try:
-                    win.destroy()
-                except Exception:
-                    pass
-                setattr(self, name, None)
-
-    def create_notification_window(self, title, message):
-        cfg = self.ncfg
-        self.cancel_classic()
-        scale = float(cfg.get("scale", 1.0))
-        style = self.notification_style(cfg)
-        
-        if style == "classic":
-            # Plain Tk window: sizes in real pixels, scaled by hand for the Windows DPI
-            px = scale * dpi_factor(self)
-            win = tk.Toplevel(self)
-            win.overrideredirect(True)
-            win.attributes("-topmost", True)
-            win.attributes("-alpha", 0.0)
-            win.configure(bg=self.KEY)
-            if os.name == 'nt':
-                win.wm_attributes("-transparentcolor", self.KEY)
-            
-            width = int(420 * px)
-            self.canvas = tk.Canvas(win, width=width, height=int(135 * px), bg=self.KEY, highlightthickness=0)
-            self.canvas.pack(fill="both", expand=True)
-            
-            is_dark = self.notify_dark
-            text_color = "#ffffff" if is_dark else "#000000"
-            subtext_color = "#e5e5ea" if is_dark else "#333333"
-            
-            # Font sizes in points: Tk already scales them for the DPI
-            title_font = ("Segoe UI Variable Display", int(18 * scale), "bold")
-            msg_font = ("Segoe UI Variable Text", int(15 * scale))
-            
-            # Testi scritti direttamente sull'immagine (niente background box grigi!)
-            self.img_id = self.canvas.create_image(0, 0, anchor="nw")
-            self.title_id = self.canvas.create_text(int(30 * px), int(32 * px), text=title, font=title_font, fill=text_color, anchor="w", width=int(360 * px))
-            self.msg_id = self.canvas.create_text(int(30 * px), int(62 * px), text=message, font=msg_font, fill=subtext_color, anchor="nw", width=int(360 * px))
-            
-            # Height that follows the text, up to a maximum
-            bbox = self.canvas.bbox(self.msg_id)
-            bottom = bbox[3] if bbox else 0
-            height = max(int(135 * px), min(bottom + int(28 * px), int(320 * px)))
-            self.canvas.configure(height=height)
-            self.width, self.height = width, height
-            
-            if self.rainbow_base is None or self.rainbow_key != (self.notify_dark, max(1200, int(width * 2.2)), max(600, int(height * 3))):
-                self.generate_rainbow_base(width, height)
-            # Maschera a pillola per ritagliare gli angoli (same size as the window)
-            radius = int(cfg.get("corner_radius", 30) * px)
-            self.pill_mask = Image.new("L", (width, height), 0)
-            ImageDraw.Draw(self.pill_mask).rounded_rectangle((0, 0, width, height), radius=radius, fill=255)
-            self.tk_img = ImageTk.PhotoImage(Image.new("RGB", (width, height), (0, 0, 1)))
-            self.canvas.itemconfig(self.img_id, image=self.tk_img)
-            self.canvas.tag_raise(self.title_id)
-            self.canvas.tag_raise(self.msg_id)
-            x, y = place_box(self, width, height, cfg.get("position", "top-center"))
-            win.geometry(f'{width}x{height}+{x}+{y}')
-        else:
-            # Vecchio stile con box nativo CTk (backup)
-            win = ctk.CTkToplevel(self)
-            win.overrideredirect(True)
-            win.attributes("-topmost", True)
-            win.attributes("-alpha", 0.0)
-            if os.name == 'nt':
-                win.wm_attributes("-transparentcolor", self.KEY)
-                win.configure(fg_color=self.KEY)
-                
-            bg_color = "#1c1c1e" if self.notify_dark else "#f2f2f7"
-            text_color = "#ffffff" if self.notify_dark else "#000000"
-            subtext_color = "#a1a1a6" if self.notify_dark else "#3c3c43"
-            border_color = "#3a3a3c" if self.notify_dark else "#c6c6c8"
-            
-            radius = int(cfg.get("corner_radius", 30))
-            if radius > 45: radius = 45 # Limite CTkFrame
-            
-            self.frame = ctk.CTkFrame(win, fg_color=bg_color, corner_radius=radius, border_width=1, border_color=border_color)
-            self.frame.pack(fill="both", expand=True, padx=2, pady=2)
-            
-            self.title_label = ctk.CTkLabel(self.frame, text=title, font=ctk.CTkFont(size=int(16 * scale), weight="bold"), text_color=text_color)
-            self.title_label.pack(pady=(int(12 * scale), 2), padx=int(18 * scale), anchor="w")
-            
-            self.message_label = ctk.CTkLabel(self.frame, text=message, font=ctk.CTkFont(size=int(14 * scale)), text_color=subtext_color, justify="left", wraplength=int(340 * scale))
-            self.message_label.pack(pady=(0, int(10 * scale)), padx=int(18 * scale), anchor="w")
-            
-            # customtkinter scales sizes given to geometry(), not the position:
-            # the height follows the text, the position uses real pixels
-            ws = ctk_scaling(win)
-            width_l = int(380 * scale)
-            try:
-                win.update_idletasks()
-                need = int(self.frame.winfo_reqheight() / ws) + 4
-            except Exception:
-                need = 0
-            height_l = max(int(95 * scale), min(need, int(320 * scale)))
-            self.width, self.height = int(width_l * ws), int(height_l * ws)
-            x, y = place_box(self, self.width, self.height, cfg.get("position", "top-center"))
-            win.geometry(f'{width_l}x{height_l}+{x}+{y}')
-        
-        win.bind("<Button-1>", lambda _e: self.hide_notification())
-        self.notify_window = win
-
-    def animate_rainbow(self):
-        # never two animations at the same time
-        if self.rainbow_task:
-            try:
-                self.after_cancel(self.rainbow_task)
-            except Exception:
-                pass
-        self.rainbow_task = None
-        if self.notify_window and self.notify_window.winfo_exists():
-            width, height = self.width, self.height
-            bw, bh = self.rainbow_base.size
-            
-            # Calcoliamo una traiettoria fluida usando curve di Lissajous (il tempo guida il movimento)
-            t = time.time() * 0.4 
-            
-            # Centro dell'immagine gigante e raggio di movimento
-            cx, cy = bw / 2 - (width / 2), bh / 2 - (height / 2)
-            rx, ry = (bw - width) / 2 - 10, (bh - height) / 2 - 10
-            
-            # Movimento fluido e organico nelle direzioni X e Y
-            offset_x = int(cx + math.sin(t) * rx)
-            offset_y = int(cy + math.cos(t * 0.8) * ry)
-            
-            # Ritagliamo l'inquadratura corrente dal grande sfondo fluido
-            cropped = self.rainbow_base.crop((offset_x, offset_y, offset_x + width, offset_y + height))
-            
-            # Applichiamo la maschera per gli angoli arrotondati
-            final_img = Image.new("RGB", (width, height), (0, 0, 1))
-            final_img.paste(cropped, (0, 0), self.pill_mask)
-            
-            # Aggiorniamo il canvas
-            self.tk_img.paste(final_img)
-            
-            # Aggiornamento in base agli FPS
-            fps = self.ncfg.get("fps", 50)
-            delay = int(1000 / fps) if fps > 0 else 20
-            self.rainbow_task = self.after(delay, self.animate_rainbow)
-
     def show_notification(self, title, message, icon=None, app_name=None, cfg=None, preview=False):
         # cfg: settings to draw with (the preview passes its own, without changing the app's)
         cfg = cfg if cfg is not None else self.settings
@@ -884,10 +692,7 @@ class MainApplication(ctk.CTk):
             self.after_cancel(self.hide_task)
             self.hide_task = None
         try:
-            if self.notification_style(cfg) in ("glass", "aurora"):
-                self.show_styled_notification(title, message, icon, app_name)
-            else:
-                self.show_classic_notification(title, message)
+            self.show_styled_notification(title, message, icon, app_name)
         except Exception:
             log.exception("Notifica non mostrata")
             self.showing = False
@@ -895,27 +700,8 @@ class MainApplication(ctk.CTk):
         duration_ms = int(float(cfg.get("duration", 5)) * 1000)
         self.hide_task = self.after(duration_ms, self.hide_notification)
 
-    def show_classic_notification(self, title, message):
-        self.create_notification_window(title, message)
-        if self.notification_style() == "classic":
-            self.animate_rainbow()
-        
-        # Animazione Fade-in con effetto vetro (alpha)
-        target_alpha = float(self.ncfg.get("alpha", 0.94))
-        win = self.notify_window
-        def fade_in(alpha=0.0):
-            self.fade_task = None
-            if win is not self.notify_window or not win.winfo_exists():
-                return
-            alpha = min(target_alpha, alpha + 0.15)
-            win.attributes("-alpha", alpha)
-            if alpha < target_alpha:
-                self.fade_task = self.after(20, lambda: fade_in(alpha))
-        fade_in()
-
     def show_styled_notification(self, title, message, icon, app_name):
-        # Styles A (aurora) and B (glass): one window drawn with Pillow
-        self.cancel_classic()
+        # Every style is one window drawn with Pillow (notification_styles)
         self.styled_popup = StyledPopup(self, self.ncfg, title, message, icon,
                                         app_name or "Home Assistant", self.notify_dark,
                                         on_click=self.hide_notification)
@@ -935,31 +721,6 @@ class MainApplication(ctk.CTk):
         if self.styled_popup is not None:
             self.styled_popup.start_exit()
             self.styled_popup = None
-        if self.rainbow_task:
-            self.after_cancel(self.rainbow_task)
-            self.rainbow_task = None
-        if self.fade_task:
-            self.after_cancel(self.fade_task)
-            self.fade_task = None
-            
-        win = self.notify_window
-        if win is not None:
-            self.notify_window = None
-            self.fading_window = win
-            def fade_out(alpha):
-                self.fade_task = None
-                if not win.winfo_exists():
-                    return
-                alpha -= 0.15
-                if alpha > 0.0:
-                    win.attributes("-alpha", alpha)
-                    self.fade_task = self.after(20, lambda: fade_out(alpha))
-                else:
-                    win.destroy()
-                    if self.fading_window is win:
-                        self.fading_window = None
-            # starts from the chosen transparency, not from a fixed value
-            fade_out(float(self.ncfg.get("alpha", 0.94)))
 
     # --- Main loop of the queues -------------------------------------------
     def check_queues(self):
@@ -1016,7 +777,6 @@ class MainApplication(ctk.CTk):
                 except Exception:
                     pass
             self.close_styled_popup()
-            self.cancel_classic()
             self.quit()
 
     # --- Updates -------------------------------------------------------------
@@ -1110,7 +870,6 @@ class MainApplication(ctk.CTk):
         self.apply_theme()
         # colours and sizes are rebuilt now, not at the next preview
         self.notify_dark = nstyles.resolve_dark(self.settings.get("theme", "dark"))
-        self.generate_rainbow_base()
         self.setup_mqtt()
 
 def setup_tray(app):

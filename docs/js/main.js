@@ -79,6 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
     'aurora-night': 'Soft Aurora notification, Night palette',
     'aurora-sunset': 'Soft Aurora notification, Sunset palette',
     'aurora-forest': 'Soft Aurora notification, Forest palette',
+    'classic': 'Classic notification',
+    'static': 'Static notification',
+    'ambient-washer': 'Ambient notification, washer icon',
+    'ambient-door': 'Ambient notification, door icon',
+    'ambient-warning': 'Ambient notification, warning icon',
+    'poster-washer': 'Poster notification, washer icon',
+    'poster-door': 'Poster notification, door icon',
+    'poster-warning': 'Poster notification, warning icon',
+    'vinyl': 'Vinyl notification',
   };
   let pickedTheme = null;
   const theme = () => pickedTheme || (darkQuery.matches ? 'dark' : 'light');

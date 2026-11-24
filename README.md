@@ -4,7 +4,7 @@
 
 ### 🌐 [giosci1994.github.io/PC-MQTT-Notifier](https://giosci1994.github.io/PC-MQTT-Notifier/)
 
-Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) and display sleek, non-invasive desktop notifications with animated fluid backgrounds on Windows.
+Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) and display sleek, non-invasive desktop notifications on Windows, in seven styles.
 
 <p align="center">
   <a href="https://github.com/giosci1994/PC-MQTT-Notifier/actions/workflows/build.yml"><img src="https://github.com/giosci1994/PC-MQTT-Notifier/actions/workflows/build.yml/badge.svg" alt="Build Status" /></a>
@@ -23,7 +23,7 @@ Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) 
 
 ## ✨ Features
 
-- 🪟 **Four notification styles**: *Windows 11 Glass* (blurred acrylic background with a thin animated rainbow border and a full or soft glow), *Soft Aurora* (three slowly moving colour blobs, palettes Night, Sunset, Forest), *Classic* (the animated rainbow mesh gradient) and *Static* (no animation, 0% CPU).
+- 🪟 **Seven notification styles, one shape**: *Windows 11 Glass* (a tinted card with a thin animated rainbow border and a full or soft glow; the default), *Soft Aurora* (three slowly moving colour blobs, palettes Night, Sunset, Forest), *Classic* (the animated rainbow), *Static* (neutral grey, no animation), *Ambient* (soft cover-like colours), *Poster* (a sharp drawn scene: waves, mountains or a sunset) and *Vinyl* (a sleeve with a turning record). Ambient and Poster pick their look from the notification icon by themselves; no pictures are downloaded.
 - 🌗 **Dark, Light or Same as Windows**: the notification follows the Windows app theme by itself.
 - 🔔 **Icons and app name**: optional `icon` and `app` fields in the payload; a progress bar shows the remaining time; click a notification to close it.
 - 🎨 **Highly Customizable**: Change UI scale, opacity/transparency, corner radius, animation FPS, display duration, and screen position (top-center, bottom-right, top-right, bottom-center).
@@ -36,13 +36,19 @@ Listen to any **MQTT topic** (from Home Assistant, Node-RED, or custom scripts) 
 
 ## 📸 Screenshots
 
-<p align="center">
-  <img src="docs/dark_pop-up_fluid.png" width="400" alt="Dark Theme Notification Popup" />
-</p>
+Drawn by the app's own code (`notification_styles.py`); on Windows the fonts are Segoe UI and Georgia.
 
-<p align="center">
-  <img src="docs/light_pop-up_static.png" width="400" alt="Light Theme Notification Popup" />
-</p>
+| | Dark | Light |
+|---|---|---|
+| **Windows 11 Glass** (default) | <img src="docs/styles/style-glass-soft-dark.webp" width="330" alt="Glass, dark" /> | <img src="docs/styles/style-glass-soft-light.webp" width="330" alt="Glass, light" /> |
+| **Soft Aurora** | <img src="docs/styles/style-aurora-night-dark.webp" width="330" alt="Aurora, dark" /> | <img src="docs/styles/style-aurora-night-light.webp" width="330" alt="Aurora, light" /> |
+| **Classic** | <img src="docs/styles/style-classic-dark.webp" width="330" alt="Classic, dark" /> | <img src="docs/styles/style-classic-light.webp" width="330" alt="Classic, light" /> |
+| **Static** | <img src="docs/styles/style-static-dark.webp" width="330" alt="Static, dark" /> | <img src="docs/styles/style-static-light.webp" width="330" alt="Static, light" /> |
+| **Ambient** | <img src="docs/styles/style-ambient-door-dark.webp" width="330" alt="Ambient, dark" /> | <img src="docs/styles/style-ambient-washer-light.webp" width="330" alt="Ambient, light" /> |
+| **Poster** | <img src="docs/styles/style-poster-door-dark.webp" width="330" alt="Poster, dark" /> | <img src="docs/styles/style-poster-washer-light.webp" width="330" alt="Poster, light" /> |
+| **Vinyl** | <img src="docs/styles/style-vinyl-dark.webp" width="330" alt="Vinyl, dark" /> | <img src="docs/styles/style-vinyl-light.webp" width="330" alt="Vinyl, light" /> |
+
+After an update you keep the style you had, with the new look; new installs start with Glass and the soft glow.
 
 ---
 
@@ -89,9 +95,9 @@ Send a JSON payload with a `title` and `message` key:
 
 | Field | Required | What it does |
 |---|---|---|
-| `title` | one of the two | first line, in bold |
-| `message` | one of the two | the text (up to 3 lines in the Glass and Aurora styles) |
-| `icon` | no | Glass and Aurora styles: one of `bell`, `info`, `warning`, `check`, `door`, `washer`, `dishwasher`, `home`, `light` (also `mdi:bell`, `mdi:door`…), or an emoji such as `"🔔"`. Missing or unknown: a bell |
+| `title` | one of the two | in bold, up to 2 lines |
+| `message` | one of the two | the text, up to 3 lines |
+| `icon` | no | one of `bell`, `info`, `warning`, `check`, `door`, `washer`, `dishwasher`, `home`, `light` (also `mdi:bell`, `mdi:door`…), or an emoji such as `"🔔"`. Missing or unknown: a bell. Ambient and Poster choose their colours or scene from it (an emoji or an unknown icon: from the title) |
 | `app` | no | the small line above the title (default `Home Assistant`) |
 
 A plain text payload (not JSON), or a JSON string or number, is shown as the message.
@@ -151,7 +157,7 @@ This generates `Output/PC-MQTT-Notifier-Setup.exe`. In the CI the version comes 
 PC-MQTT-Notifier/
 ├── main.py                  # Core application (CTk GUI, MQTT client, pystray, auto-updater)
 ├── app_core.py              # Config, log, payloads, versions, update checks (no GUI)
-├── notification_styles.py   # Glass and Aurora styles drawn with Pillow, Windows helpers
+├── notification_styles.py   # The seven notification styles drawn with Pillow, Windows helpers
 ├── requirements.txt         # Python dependencies (pinned)
 ├── CHANGELOG.md             # What changed in each version
 ├── icon.png / icon.ico      # Application icons
